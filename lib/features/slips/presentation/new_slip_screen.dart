@@ -199,9 +199,59 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
   Future<void> _onSave() async {
     if (!_validateAndProcess()) return;
 
+    final rounds = _buildRoundInputs();
+
+    // Check duplicate warning
+    final allSlips = await _repository.getAllSlips();
+    final existingChecks = <ExistingSlipCheck>[];
+
+    for (var s in allSlips) {
+      final sRounds = await _repository.getRoundsForSlip(s.id);
+      existingChecks.add(
+        ExistingSlipCheck(
+          vehicleNumber: s.vehicleNo,
+          date: DateFormat('dd/MM/yyyy').format(s.date),
+          grossWeights: sRounds.map((r) => r.grossKg.toDouble()).toList(),
+          tareWeights: sRounds.map((r) => (r.emptyTulaneKg ?? 0).toDouble()).toList(),
+        ),
+      );
+    }
+
+    final isDuplicate = SlipCalculator.isDuplicateSlip(
+      vehicleNumber: _vehicleController.text,
+      date: _dateStr,
+      rounds: rounds,
+      existingSlips: existingChecks,
+    );
+
+    if (isDuplicate && mounted) {
+      final shouldProceed = await showDialog<bool>(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            backgroundColor: AppColors.surface,
+            title: const Text('Aisi slip pehle se hai', style: TextStyle(color: AppColors.text, fontSize: 16)),
+            content: const Text('Isi gaadi no, tareekh aur vajan ki slip pehle se bani hui hai. Kya aap ise fir bhi save karna chahte hain?', style: TextStyle(color: AppColors.muted, fontSize: 13)),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(context, false),
+                child: const Text('Radd karein', style: TextStyle(color: AppColors.muted)),
+              ),
+              TextButton(
+                onPressed: () => Navigator.pop(context, true),
+                child: const Text('Save karein', style: TextStyle(color: AppColors.lime, fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (shouldProceed != true) return;
+    }
+
     final actualReceiptNo = await _repository.getNextReceiptNumber();
     final charge = double.parse(_chargeController.text);
-    final rounds = [
+    final roundMaps = [
       {
         'material': _mat1Controller.text,
         'gross': double.parse(_gross1Controller.text),
@@ -212,7 +262,7 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
     ];
 
     if (_hasRound2) {
-      rounds.add({
+      roundMaps.add({
         'material': _mat2Controller.text,
         'gross': double.parse(_gross2Controller.text),
         'tare': double.parse(_tare2Controller.text),
@@ -228,7 +278,7 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
       vehicleNo: _vehicleController.text.trim().toUpperCase(),
       totalNetWeight: _getTotalNet(),
       charge: charge,
-      rounds: rounds,
+      rounds: roundMaps,
     );
 
     await SlipDraftStorage.clearDraft();
@@ -640,7 +690,7 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
                         '₹$ch',
                         style: TextStyle(
                           fontSize: 11,
-                          fontWeight: isSelected ? FontWeight.w500 : FontWeight.w400,
+                          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w400,
                           color: isSelected ? AppColors.onLime : AppColors.text,
                         ),
                       ),

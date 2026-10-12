@@ -151,6 +151,111 @@ class SlipRepository {
     return slipId;
   }
 
+  /// Increment reprint count on print or share
+  Future<void> incrementReprintCount(String slipId) async {
+    final slip = await getSlipById(slipId);
+    if (slip != null) {
+      await (db.update(db.slipsTable)..where((t) => t.id.equals(slipId))).write(
+            SlipsTableCompanion(
+              reprintCount: Value(slip.reprintCount + 1),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
+    }
+  }
+
+  /// Soft delete slip
+  Future<void> softDeleteSlip(String slipId) async {
+    await (db.update(db.slipsTable)..where((t) => t.id.equals(slipId))).write(
+          SlipsTableCompanion(
+            deletedAt: Value(DateTime.now()),
+            updatedAt: Value(DateTime.now()),
+          ),
+        );
+  }
+
+  /// Undo soft delete
+  Future<void> undoDeleteSlip(String slipId) async {
+    await (db.update(db.slipsTable)..where((t) => t.id.equals(slipId))).write(
+          const SlipsTableCompanion(
+            deletedAt: Value(null),
+          ),
+        );
+  }
+
+  /// Edit slip details and write audit log
+  Future<void> editSlip({
+    required String slipId,
+    String? newCustomerName,
+    String? newVehicleNo,
+    required List<Map<String, dynamic>> newRounds,
+  }) async {
+    final oldSlip = await getSlipById(slipId);
+    final oldRounds = await getRoundsForSlip(slipId);
+
+    if (oldSlip == null) return;
+
+    final beforeJson = {
+      'customerName': oldSlip.customerName,
+      'vehicleNo': oldSlip.vehicleNo,
+      'rounds': oldRounds.map((r) => {'gross': r.grossKg, 'tare': r.emptyTulaneKg, 'net': r.netKg}).toList(),
+    };
+
+    await db.transaction(() async {
+      await (db.update(db.slipsTable)..where((t) => t.id.equals(slipId))).write(
+            SlipsTableCompanion(
+              customerName: Value(newCustomerName),
+              vehicleNo: Value(newVehicleNo),
+              updatedAt: Value(DateTime.now()),
+            ),
+          );
+
+      // Delete old rounds and re-insert new
+      await (db.delete(db.slipRoundsTable)..where((t) => t.slipId.equals(slipId))).go();
+
+      for (int i = 0; i < newRounds.length; i++) {
+        final r = newRounds[i];
+        final gross = (r['gross'] as num).toInt();
+        final tare = (r['tare'] as num).toInt();
+        final net = gross - tare;
+
+        await db.into(db.slipRoundsTable).insert(
+              SlipRoundsTableCompanion.insert(
+                id: '${slipId}_round_${i + 1}',
+                slipId: slipId,
+                roundNo: i + 1,
+                material: Value(r['material'] as String?),
+                grossKg: gross,
+                emptyTulaneKg: Value(tare),
+                emptyDriverKg: Value((r['driverTare'] as num?)?.toInt()),
+                netKg: net,
+                extra: Value(r['bagExtra'] as String?),
+                createdAt: DateTime.now(),
+                updatedAt: DateTime.now(),
+              ),
+            );
+      }
+
+      final afterJson = {
+        'customerName': newCustomerName,
+        'vehicleNo': newVehicleNo,
+        'rounds': newRounds,
+      };
+
+      // Write Audit Log entry
+      await db.into(db.auditLogTable).insert(
+            AuditLogTableCompanion.insert(
+              id: 'audit_${DateTime.now().millisecondsSinceEpoch}',
+              targetType: 'slip',
+              entityId: slipId,
+              action: 'edit',
+              detailsJson: jsonEncode({'before': beforeJson, 'after': afterJson}),
+              createdAt: DateTime.now(),
+            ),
+          );
+    });
+  }
+
   /// Get slip by ID
   Future<SlipsTableData?> getSlipById(String id) async {
     return (db.select(db.slipsTable)..where((t) => t.id.equals(id))).getSingleOrNull();
@@ -162,6 +267,11 @@ class SlipRepository {
           ..where((t) => t.slipId.equals(slipId))
           ..orderBy([(t) => OrderingTerm.asc(t.roundNo)]))
         .get();
+  }
+
+  /// Get all existing active slips for duplicate detection
+  Future<List<SlipsTableData>> getAllSlips() async {
+    return (db.select(db.slipsTable)..where((t) => t.deletedAt.isNull())).get();
   }
 
   /// Get customer suggestions

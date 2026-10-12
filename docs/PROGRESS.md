@@ -36,3 +36,14 @@
   - Configured `StatefulShellRoute.indexedStack` in `app_router.dart` to fix tab state persistence and eliminate `RenderFlex` overflow during bottom nav animation.
   - Displayed app version `v1.0.0+1` on Home header and Settings screen.
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 19 tests passing).
+
+## Milestone 4: Slips Search, Filtering, Reprint & Edit
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented instant search in `SlipsListScreen` across Customer Name, Vehicle Number, and Receipt Number with date picker filter and status filter chips (`Sab`, `Pending`, `Received`, `Udhar`).
+  - Implemented reprint count tracking and "DUPLICATE COPY - reprinted on <date>" watermark/badge display on Slip Card Screen and generated PDFs.
+  - Implemented `editSlip` with automatic audit log recording (`auditLogTable`) containing before and after JSON state diffs.
+  - Implemented soft delete (`softDeleteSlip`) with instant Undo Snackbar.
+  - Added duplicate slip warning confirmation dialog in `NewSlipScreen` before saving.
+  - Added unit tests for reprint count, soft delete/undo, and edit audit logging (`test/slip_management_test.dart`) and widget tests (`test/slips_list_widget_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 24 tests passing).

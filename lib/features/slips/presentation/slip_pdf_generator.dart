@@ -17,12 +17,15 @@ class SlipPdfGenerator {
     required String shopName,
     required String shopAddress,
     required String capacityText,
+    bool isDuplicate = false,
   }) async {
     final pdf = pw.Document();
 
     final theme = pw.ThemeData.withFont(
       base: await PdfGoogleFonts.notoSansDevanagariRegular(),
     );
+
+    final todayStr = DateFormat('dd MMM yyyy').format(DateTime.now());
 
     pdf.addPage(
       pw.Page(
@@ -98,6 +101,24 @@ class SlipPdfGenerator {
                               ),
                             ),
                           ),
+                          if (isDuplicate) ...[
+                            pw.Spacer(),
+                            pw.Container(
+                              padding: const pw.EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                              decoration: pw.BoxDecoration(
+                                color: PdfColor.fromHex('#FF8A80'),
+                                borderRadius: pw.BorderRadius.circular(10),
+                              ),
+                              child: pw.Text(
+                                'DUPLICATE COPY - reprinted on $todayStr',
+                                style: pw.TextStyle(
+                                  color: PdfColors.white,
+                                  fontSize: 7,
+                                  fontWeight: pw.FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ],

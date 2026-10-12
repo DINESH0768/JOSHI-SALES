@@ -44,6 +44,9 @@ class _SlipCardScreenState extends State<SlipCardScreen> {
   Future<void> _onSharePdf() async {
     if (_slip == null) return;
 
+    await _repository.incrementReprintCount(_slip!.id);
+    _loadData();
+
     final dateStr = DateFormat('dd MMM yyyy').format(_slip!.date);
 
     final pdfBytes = await SlipPdfGenerator.generatePdf(
@@ -63,6 +66,7 @@ class _SlipCardScreenState extends State<SlipCardScreen> {
       shopName: 'जोशी कम्प्यूटराइज धर्मकांटा',
       shopAddress: 'जयपुर रोड, नई मण्डी के पास, रावतसर (राज.)',
       capacityText: 'क्षमता 60 टन',
+      isDuplicate: _slip!.reprintCount > 0,
     );
 
     await SlipPdfGenerator.sharePdf(pdfBytes, 'Slip_${_slip!.receiptNo}.pdf');
@@ -71,6 +75,9 @@ class _SlipCardScreenState extends State<SlipCardScreen> {
   Future<void> _onPrintPdf() async {
     if (_slip == null) return;
 
+    await _repository.incrementReprintCount(_slip!.id);
+    _loadData();
+
     final dateStr = DateFormat('dd MMM yyyy').format(_slip!.date);
 
     final pdfBytes = await SlipPdfGenerator.generatePdf(
@@ -90,9 +97,34 @@ class _SlipCardScreenState extends State<SlipCardScreen> {
       shopName: 'जोशी कम्प्यूटराइज धर्मकांटा',
       shopAddress: 'जयपुर रोड, नई मण्डी के पास, रावतसर (राज.)',
       capacityText: 'क्षमता 60 टन',
+      isDuplicate: _slip!.reprintCount > 0,
     );
 
     await SlipPdfGenerator.printPdf(pdfBytes);
+  }
+
+  Future<void> _onSoftDelete() async {
+    if (_slip == null) return;
+
+    final slipId = _slip!.id;
+    await _repository.softDeleteSlip(slipId);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Slip delete ho gayi'),
+          action: SnackBarAction(
+            label: 'Undo',
+            textColor: AppColors.lime,
+            onPressed: () async {
+              await _repository.undoDeleteSlip(slipId);
+              _loadData();
+            },
+          ),
+        ),
+      );
+      Navigator.pop(context);
+    }
   }
 
   Widget _buildPaperCard() {
@@ -100,6 +132,8 @@ class _SlipCardScreenState extends State<SlipCardScreen> {
 
     final dateStr = DateFormat('dd MMM yyyy').format(_slip!.date);
     final totalNet = _rounds.fold(0, (sum, r) => sum + r.netKg);
+    final isDuplicate = _slip!.reprintCount > 0;
+    final todayStr = DateFormat('dd MMM yyyy').format(DateTime.now());
 
     return Container(
       decoration: BoxDecoration(
@@ -182,6 +216,20 @@ class _SlipCardScreenState extends State<SlipCardScreen> {
                     ),
                   ],
                 ),
+                if (isDuplicate) ...[
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppColors.danger,
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: Text(
+                      'DUPLICATE COPY - reprinted on $todayStr',
+                      style: const TextStyle(color: Colors.white, fontSize: 9, fontWeight: FontWeight.bold),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -441,6 +489,18 @@ class _SlipCardScreenState extends State<SlipCardScreen> {
                   const SizedBox(width: 10),
                   Text('Slip ${_slip?.receiptNo ?? ""}', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
                   const Spacer(),
+                  GestureDetector(
+                    onTap: _onSoftDelete,
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(8),
+                        border: Border.all(color: AppColors.border, width: 0.5),
+                      ),
+                      child: const Icon(Icons.delete_outline_rounded, color: AppColors.danger, size: 18),
+                    ),
+                  ),
+                  const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
