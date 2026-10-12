@@ -53,6 +53,90 @@ class AppDatabase extends _$AppDatabase {
             ),
           );
 
+          // Seed Debug Supplier "Bhanwar Lal ji" (Chai wale, ₹10/chai)
+          const supplierId = 'supplier_bhanwar_lal';
+          await into(suppliersTable).insert(
+            SuppliersTableCompanion.insert(
+              id: supplierId,
+              name: 'Bhanwar Lal ji',
+              category: const Value('Chai wale'),
+              ratePerUnit: const Value(10),
+              unitName: const Value('chai'),
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          );
+
+          // Seed entries & payment to leave ₹360 balance (matching Screen 18)
+          final date1 = DateTime(2026, 10, 1);
+          final date10 = DateTime(2026, 10, 10);
+          final dateToday = DateTime.now();
+
+          // 1 Oct: Payment ₹400 via UPI (and linked expense)
+          const expId = 'exp_bhanwar_400';
+          await into(expensesTable).insert(
+            ExpensesTableCompanion.insert(
+              id: expId,
+              name: 'Chai-pani',
+              amount: 400,
+              mode: 'upi',
+              date: date1,
+              note: const Value('Paise diye - Bhanwar Lal ji'),
+              createdAt: date1,
+              updatedAt: date1,
+            ),
+          );
+          await into(supplierPaymentsTable).insert(
+            SupplierPaymentsTableCompanion.insert(
+              id: 'sp_bhanwar_1',
+              supplierId: supplierId,
+              amount: 400,
+              mode: 'upi',
+              date: date1,
+              expenseId: const Value(expId),
+              createdAt: date1,
+              updatedAt: date1,
+            ),
+          );
+
+          // Entries: 66 chai @ 10 = 660, 6 chai @ 10 = 60, 4 chai @ 10 = 40 (Total entries = 760, Total payments = 400, Balance = 360)
+          await into(supplierEntriesTable).insert(
+            SupplierEntriesTableCompanion.insert(
+              id: 'se_bhanwar_1',
+              supplierId: supplierId,
+              date: date1,
+              count: const Value(66),
+              amount: 660,
+              note: const Value('66 chai'),
+              createdAt: date1,
+              updatedAt: date1,
+            ),
+          );
+          await into(supplierEntriesTable).insert(
+            SupplierEntriesTableCompanion.insert(
+              id: 'se_bhanwar_2',
+              supplierId: supplierId,
+              date: date10,
+              count: const Value(6),
+              amount: 60,
+              note: const Value('6 chai'),
+              createdAt: date10,
+              updatedAt: date10,
+            ),
+          );
+          await into(supplierEntriesTable).insert(
+            SupplierEntriesTableCompanion.insert(
+              id: 'se_bhanwar_3',
+              supplierId: supplierId,
+              date: dateToday,
+              count: const Value(4),
+              amount: 40,
+              note: const Value('4 chai'),
+              createdAt: dateToday,
+              updatedAt: dateToday,
+            ),
+          );
+
           final baseDate = DateTime(2026, 10, 1);
           for (int i = 1; i <= 40; i++) {
             final slipId = 'sonu_slip_$i';

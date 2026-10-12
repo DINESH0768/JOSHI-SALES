@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/widgets/floating_bottom_nav.dart';
-import '../../core/widgets/placeholder_screen.dart';
 import '../../data/db/app_database.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/income/presentation/aaj_ki_income_screen.dart';
@@ -13,6 +12,9 @@ import '../../features/slips/presentation/new_slip_screen.dart';
 import '../../features/slips/presentation/slip_card_screen.dart';
 import '../../features/slips/presentation/slips_list_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
+import '../../features/kharcha/presentation/kharcha_screen.dart';
+import '../../features/kharcha/presentation/supplier_detail_screen.dart';
+import '../../features/kharcha/presentation/supplier_list_screen.dart';
 import '../../features/udhar/presentation/customer_detail_screen.dart';
 import '../../features/udhar/presentation/jama_rasid_screen.dart';
 import '../../features/udhar/presentation/udhar_list_screen.dart';
@@ -73,6 +75,17 @@ final appRouter = GoRouter(
       builder: (context, state) {
         final paymentId = state.pathParameters['paymentId'] ?? '';
         return JamaRasidScreen(paymentId: paymentId, db: _db);
+      },
+    ),
+    GoRoute(
+      path: '/kharcha/suppliers',
+      builder: (context, state) => SupplierListScreen(db: _db),
+    ),
+    GoRoute(
+      path: '/kharcha/suppliers/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return SupplierDetailScreen(supplierId: id, db: _db);
       },
     ),
     StatefulShellRoute.indexedStack(
@@ -136,7 +149,7 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/kharcha',
-              builder: (context, state) => const PlaceholderScreen(title: 'Kharcha'),
+              builder: (context, state) => KharchaScreen(db: _db),
             ),
           ],
         ),
