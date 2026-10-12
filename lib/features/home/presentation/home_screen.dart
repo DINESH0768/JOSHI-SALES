@@ -8,59 +8,77 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.bg,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Header lime area
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: const BoxDecoration(
-                color: AppColors.lime,
-                borderRadius: BorderRadius.vertical(bottom: Radius.circular(22)),
-              ),
+      body: Column(
+        children: [
+          // Header lime area (.lhd)
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.only(
+              top: 34,
+              left: 14,
+              right: 14,
+              bottom: 24,
+            ),
+            decoration: const BoxDecoration(
+              color: AppColors.lime,
+              borderRadius: BorderRadius.vertical(bottom: Radius.circular(24)),
+            ),
+            child: SafeArea(
+              bottom: false,
               child: Row(
                 children: [
+                  // Logo Square 34x34
                   Container(
-                    width: 36,
-                    height: 36,
+                    width: 34,
+                    height: 34,
                     decoration: BoxDecoration(
                       color: AppColors.bg,
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
-                    alignment: Alignment.center,
-                    child: const Text(
-                      'J',
-                      style: TextStyle(
-                        color: AppColors.lime,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                      ),
+                    clipBehavior: Clip.antiAlias,
+                    child: Image.asset(
+                      'assets/branding/app_icon_lime.png',
+                      fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(width: 10),
+                  const SizedBox(width: 8),
                   const Text(
                     'Kanta Slip',
                     style: TextStyle(
                       color: AppColors.onLime,
-                      fontSize: 18,
+                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
                   const Spacer(),
-                  IconButton(
-                    icon: const Icon(Icons.add_circle, color: AppColors.onLime, size: 28),
-                    onPressed: () {},
+                  // Plus Action Button (34x34 circle with #0B0B0C background and #C6F432 plus icon)
+                  GestureDetector(
+                    onTap: () {},
+                    child: Container(
+                      width: 34,
+                      height: 34,
+                      decoration: const BoxDecoration(
+                        color: AppColors.bg,
+                        shape: BoxShape.circle,
+                      ),
+                      alignment: Alignment.center,
+                      child: const Icon(
+                        Icons.add_rounded,
+                        color: AppColors.lime,
+                        size: 20,
+                      ),
+                    ),
                   ),
                 ],
               ),
             ),
-            const Expanded(
-              child: Center(
-                child: Text('Home Content', style: TextStyle(color: AppColors.muted)),
-              ),
+          ),
+          const Expanded(
+            child: Center(
+              child: Text('Home Content', style: TextStyle(color: AppColors.muted)),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

@@ -22,22 +22,15 @@ class FloatingBottomNav extends StatelessWidget {
     ];
 
     return Container(
-      margin: const EdgeInsets.only(left: 14, right: 14, bottom: 16),
-      height: 62,
+      margin: const EdgeInsets.only(left: 12, right: 12, bottom: 12),
+      padding: const EdgeInsets.all(7),
       decoration: BoxDecoration(
         color: AppColors.surface2,
-        borderRadius: BorderRadius.circular(26),
+        borderRadius: BorderRadius.circular(28),
         border: Border.all(color: AppColors.border, width: 0.5),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.4),
-            blurRadius: 16,
-            offset: const Offset(0, 6),
-          ),
-        ],
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: List.generate(items.length, (index) {
           final isSelected = currentIndex == index;
           final item = items[index];
@@ -48,10 +41,12 @@ class FloatingBottomNav extends StatelessWidget {
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 200),
               curve: Curves.easeOutCubic,
+              height: 36,
               padding: EdgeInsets.symmetric(
-                horizontal: isSelected ? 14 : 10,
-                vertical: 8,
+                horizontal: isSelected ? 14 : 0,
               ),
+              width: isSelected ? null : 40,
+              alignment: Alignment.center,
               decoration: isSelected
                   ? BoxDecoration(
                       color: AppColors.lime,
@@ -59,12 +54,13 @@ class FloatingBottomNav extends StatelessWidget {
                     )
                   : null,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Icon(
                     item.icon,
-                    size: 22,
-                    color: isSelected ? AppColors.onLime : AppColors.muted,
+                    size: 18,
+                    color: isSelected ? AppColors.onLime : AppColors.text,
                   ),
                   if (isSelected) ...[
                     const SizedBox(width: 6),
@@ -72,7 +68,7 @@ class FloatingBottomNav extends StatelessWidget {
                       item.label,
                       style: const TextStyle(
                         color: AppColors.onLime,
-                        fontSize: 13,
+                        fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
