@@ -2,11 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/widgets/floating_bottom_nav.dart';
 import '../../core/widgets/placeholder_screen.dart';
+import '../../data/db/app_database.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/slips/presentation/new_slip_screen.dart';
+import '../../features/slips/presentation/slip_card_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
+final AppDatabase _db = AppDatabase();
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
 
 final appRouter = GoRouter(
@@ -20,6 +24,17 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
+    ),
+    GoRoute(
+      path: '/slips/new',
+      builder: (context, state) => NewSlipScreen(db: _db),
+    ),
+    GoRoute(
+      path: '/slips/card/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return SlipCardScreen(slipId: id, db: _db);
+      },
     ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,

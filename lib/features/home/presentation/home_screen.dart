@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:kanta_slip/core/theme/app_colors.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -53,7 +54,7 @@ class HomeScreen extends StatelessWidget {
                   const Spacer(),
                   // Plus Action Button (34x34 circle with #0B0B0C background and #C6F432 plus icon)
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => context.push('/slips/new'),
                     child: Container(
                       width: 34,
                       height: 34,
