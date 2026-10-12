@@ -41,6 +41,51 @@ class AppDatabase extends _$AppDatabase {
           await into(countersTable).insert(
             CountersTableCompanion.insert(name: 'jama_receipt', currentValue: 1),
           );
+
+          // Seed Debug Demo Data for Sonu (40 unpaid slips @ ₹50 = ₹2,000 total)
+          const sonuCustId = 'udhar_sonu';
+          await into(udharCustomersTable).insert(
+            UdharCustomersTableCompanion.insert(
+              id: sonuCustId,
+              name: 'Sonu',
+              createdAt: DateTime.now(),
+              updatedAt: DateTime.now(),
+            ),
+          );
+
+          final baseDate = DateTime(2026, 10, 1);
+          for (int i = 1; i <= 40; i++) {
+            final slipId = 'sonu_slip_$i';
+            final slipDate = baseDate.add(Duration(days: i ~/ 2));
+            await into(slipsTable).insert(
+              SlipsTableCompanion.insert(
+                id: slipId,
+                receiptNo: 2000 + i,
+                date: slipDate,
+                customerName: const Value('Sonu'),
+                vehicleNo: const Value('RJ 31 GA 0000'),
+                charge: 50,
+                status: 'udhar',
+                udharCustomerId: const Value(sonuCustId),
+                createdAt: slipDate,
+                updatedAt: slipDate,
+              ),
+            );
+
+            await into(slipRoundsTable).insert(
+              SlipRoundsTableCompanion.insert(
+                id: '${slipId}_round_1',
+                slipId: slipId,
+                roundNo: 1,
+                material: const Value('गेहूं'),
+                grossKg: 20000,
+                emptyTulaneKg: const Value(5000),
+                netKg: 15000,
+                createdAt: slipDate,
+                updatedAt: slipDate,
+              ),
+            );
+          }
           await into(shopSettingsTable).insert(
             ShopSettingsTableCompanion.insert(
               id: 'default_shop',

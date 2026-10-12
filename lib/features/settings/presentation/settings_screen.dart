@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../payments/domain/services/upi_service.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -11,6 +13,80 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   bool _upiQrEnabled = true;
   bool _appLockEnabled = true;
+  String? _upiId;
+  String? _qrImagePath;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUpiSettings();
+  }
+
+  Future<void> _loadUpiSettings() async {
+    final upiId = await UpiService.getUpiId();
+    final qrPath = await UpiService.getQrImagePath();
+    final enabled = await UpiService.isUpiQrEnabled();
+
+    if (mounted) {
+      setState(() {
+        _upiId = upiId;
+        _qrImagePath = qrPath;
+        _upiQrEnabled = enabled;
+      });
+    }
+  }
+
+  Future<void> _editUpiIdDialog() async {
+    final controller = TextEditingController(text: _upiId ?? '');
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: AppColors.surface,
+          title: const Text('UPI ID set karein', style: TextStyle(color: AppColors.text, fontSize: 16)),
+          content: TextField(
+            controller: controller,
+            style: const TextStyle(color: AppColors.text),
+            decoration: const InputDecoration(
+              hintText: 'उदा. 9214848519@upi',
+              hintStyle: TextStyle(color: AppColors.muted),
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('Cancel', style: TextStyle(color: AppColors.muted)),
+            ),
+            TextButton(
+              onPressed: () async {
+                final id = controller.text.trim();
+                await UpiService.saveUpiId(id);
+                setState(() => _upiId = id);
+                if (context.mounted) {
+                  Navigator.pop(context);
+                }
+              },
+              child: const Text('Save', style: TextStyle(color: AppColors.lime, fontWeight: FontWeight.bold)),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _importQrImage() async {
+    final picker = ImagePicker();
+    final file = await picker.pickImage(source: ImageSource.gallery);
+    if (file != null) {
+      await UpiService.saveQrImagePath(file.path);
+      if (mounted) {
+        setState(() => _qrImagePath = file.path);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('QR image import ho gayi!')),
+        );
+      }
+    }
+  }
 
   Widget _buildBackButton(BuildContext context) {
     return GestureDetector(
@@ -67,76 +143,85 @@ class _SettingsScreenState extends State<SettingsScreen> {
     required String subtitle,
     Widget? trailing,
     bool showBorder = true,
+    VoidCallback? onTap,
   }) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 9),
-      decoration: showBorder
-          ? const BoxDecoration(
-              border: Border(
-                bottom: BorderSide(
-                  color: AppColors.border,
-                  width: 0.5,
-                  style: BorderStyle.solid,
-                ),
-              ),
-            )
-          : null,
-      child: Row(
-        children: [
-          // Row Icon Container (.ic)
-          Container(
-            width: 32,
-            height: 32,
-            decoration: const BoxDecoration(
-              color: AppColors.surface3,
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child: Icon(
-              icon,
-              size: 16,
-              color: AppColors.text,
-            ),
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: const TextStyle(
-                    color: AppColors.text,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w500,
-                    height: 1.3,
+    return GestureDetector(
+      onTap: onTap,
+      behavior: HitTestBehavior.opaque,
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 9),
+        decoration: showBorder
+            ? const BoxDecoration(
+                border: Border(
+                  bottom: BorderSide(
+                    color: AppColors.border,
+                    width: 0.5,
+                    style: BorderStyle.solid,
                   ),
                 ),
-                Text(
-                  subtitle,
-                  style: const TextStyle(
-                    color: AppColors.muted,
-                    fontSize: 11,
-                    fontWeight: FontWeight.w400,
-                    height: 1.3,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          trailing ??
-              const Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.muted,
-                size: 18,
+              )
+            : null,
+        child: Row(
+          children: [
+            // Row Icon Container (.ic)
+            Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
+                color: AppColors.surface3,
+                shape: BoxShape.circle,
               ),
-        ],
+              alignment: Alignment.center,
+              child: Icon(
+                icon,
+                size: 16,
+                color: AppColors.text,
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                      height: 1.3,
+                    ),
+                  ),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: AppColors.muted,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w400,
+                      height: 1.3,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            trailing ??
+                const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.muted,
+                  size: 18,
+                ),
+          ],
+        ),
       ),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    final upiSubtitle = _upiId != null && _upiId!.isNotEmpty
+        ? 'ID: $_upiId'
+        : (_qrImagePath != null ? 'Static QR imported' : 'QR dikhana on/off');
+
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
@@ -233,11 +318,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     _buildRow(
                       icon: Icons.qr_code_2_rounded,
                       title: 'UPI QR / UPI ID',
-                      subtitle: 'QR dikhana on/off',
+                      subtitle: upiSubtitle,
+                      onTap: _editUpiIdDialog,
                       trailing: _buildSwitch(
                         value: _upiQrEnabled,
-                        onChanged: (val) => setState(() => _upiQrEnabled = val),
+                        onChanged: (val) async {
+                          setState(() => _upiQrEnabled = val);
+                          await UpiService.setUpiQrEnabled(val);
+                        },
                       ),
+                    ),
+                    _buildRow(
+                      icon: Icons.image_outlined,
+                      title: 'Import static QR Image',
+                      subtitle: _qrImagePath != null ? 'Gallery/Camera image set' : 'Gallery se QR image chuno',
+                      onTap: _importQrImage,
                     ),
                     _buildRow(
                       icon: Icons.shopping_bag_outlined,
@@ -319,7 +414,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               // Version label (.m)
               const Text(
-                'Kanta Slip v1.0',
+                'Kanta Slip v1.0.0+1',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.muted,

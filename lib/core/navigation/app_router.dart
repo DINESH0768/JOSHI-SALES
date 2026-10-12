@@ -2,12 +2,23 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/widgets/floating_bottom_nav.dart';
 import '../../core/widgets/placeholder_screen.dart';
+import '../../data/db/app_database.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/income/presentation/aaj_ki_income_screen.dart';
+import '../../features/payments/presentation/payment_post_save_screen.dart';
+import '../../features/payments/presentation/upi_payment_screen.dart';
+import '../../features/pending/presentation/pending_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/slips/presentation/new_slip_screen.dart';
+import '../../features/slips/presentation/slip_card_screen.dart';
+import '../../features/slips/presentation/slips_list_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
+import '../../features/udhar/presentation/customer_detail_screen.dart';
+import '../../features/udhar/presentation/jama_rasid_screen.dart';
+import '../../features/udhar/presentation/udhar_list_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
-final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
+final AppDatabase _db = AppDatabase();
 
 final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
@@ -21,49 +32,66 @@ final appRouter = GoRouter(
       path: '/settings',
       builder: (context, state) => const SettingsScreen(),
     ),
-    ShellRoute(
-      navigatorKey: _shellNavigatorKey,
-      builder: (context, state, child) {
-        int index = 0;
-        final location = state.uri.toString();
-        if (location.startsWith('/slips')) {
-          index = 1;
-        } else if (location.startsWith('/pending')) {
-          index = 2;
-        } else if (location.startsWith('/udhar')) {
-          index = 3;
-        } else if (location.startsWith('/kharcha')) {
-          index = 4;
-        }
-
+    GoRoute(
+      path: '/slips/new',
+      builder: (context, state) => NewSlipScreen(db: _db),
+    ),
+    GoRoute(
+      path: '/slips/card/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return SlipCardScreen(slipId: id, db: _db);
+      },
+    ),
+    GoRoute(
+      path: '/payments/post-save/:slipId',
+      builder: (context, state) {
+        final slipId = state.pathParameters['slipId'] ?? '';
+        return PaymentPostSaveScreen(slipId: slipId, db: _db);
+      },
+    ),
+    GoRoute(
+      path: '/income/today',
+      builder: (context, state) => AajKiIncomeScreen(db: _db),
+    ),
+    GoRoute(
+      path: '/payments/upi/:slipId',
+      builder: (context, state) {
+        final slipId = state.pathParameters['slipId'] ?? '';
+        return UpiPaymentScreen(slipId: slipId, db: _db);
+      },
+    ),
+    GoRoute(
+      path: '/udhar/customer/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return CustomerDetailScreen(customerId: id, db: _db);
+      },
+    ),
+    GoRoute(
+      path: '/udhar/rasid/:paymentId',
+      builder: (context, state) {
+        final paymentId = state.pathParameters['paymentId'] ?? '';
+        return JamaRasidScreen(paymentId: paymentId, db: _db);
+      },
+    ),
+    StatefulShellRoute.indexedStack(
+      builder: (context, state, navigationShell) {
         return Scaffold(
           body: Stack(
             children: [
-              Positioned.fill(child: child),
+              Positioned.fill(child: navigationShell),
               Positioned(
                 left: 0,
                 right: 0,
                 bottom: 0,
                 child: FloatingBottomNav(
-                  currentIndex: index,
+                  currentIndex: navigationShell.currentIndex,
                   onTap: (newIndex) {
-                    switch (newIndex) {
-                      case 0:
-                        context.go('/home');
-                        break;
-                      case 1:
-                        context.go('/slips');
-                        break;
-                      case 2:
-                        context.go('/pending');
-                        break;
-                      case 3:
-                        context.go('/udhar');
-                        break;
-                      case 4:
-                        context.go('/kharcha');
-                        break;
-                    }
+                    navigationShell.goBranch(
+                      newIndex,
+                      initialLocation: newIndex == navigationShell.currentIndex,
+                    );
                   },
                 ),
               ),
@@ -71,26 +99,46 @@ final appRouter = GoRouter(
           ),
         );
       },
-      routes: [
-        GoRoute(
-          path: '/home',
-          builder: (context, state) => const HomeScreen(),
+      branches: [
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/home',
+              builder: (context, state) => HomeScreen(db: _db),
+            ),
+          ],
         ),
-        GoRoute(
-          path: '/slips',
-          builder: (context, state) => const PlaceholderScreen(title: 'Slips'),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/slips',
+              builder: (context, state) => SlipsListScreen(db: _db),
+            ),
+          ],
         ),
-        GoRoute(
-          path: '/pending',
-          builder: (context, state) => const PlaceholderScreen(title: 'Pending'),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/pending',
+              builder: (context, state) => PendingScreen(db: _db),
+            ),
+          ],
         ),
-        GoRoute(
-          path: '/udhar',
-          builder: (context, state) => const PlaceholderScreen(title: 'Udhar'),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/udhar',
+              builder: (context, state) => UdharListScreen(db: _db),
+            ),
+          ],
         ),
-        GoRoute(
-          path: '/kharcha',
-          builder: (context, state) => const PlaceholderScreen(title: 'Kharcha'),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: '/kharcha',
+              builder: (context, state) => const PlaceholderScreen(title: 'Kharcha'),
+            ),
+          ],
         ),
       ],
     ),

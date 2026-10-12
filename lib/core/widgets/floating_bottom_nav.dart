@@ -43,9 +43,9 @@ class FloatingBottomNav extends StatelessWidget {
               curve: Curves.easeOutCubic,
               height: 36,
               padding: EdgeInsets.symmetric(
-                horizontal: isSelected ? 14 : 0,
+                horizontal: isSelected ? 12 : 0,
               ),
-              width: isSelected ? null : 40,
+              width: isSelected ? null : 38,
               alignment: Alignment.center,
               decoration: isSelected
                   ? BoxDecoration(
@@ -53,27 +53,34 @@ class FloatingBottomNav extends StatelessWidget {
                       borderRadius: BorderRadius.circular(20),
                     )
                   : null,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    item.icon,
-                    size: 18,
-                    color: isSelected ? AppColors.onLime : AppColors.text,
-                  ),
-                  if (isSelected) ...[
-                    const SizedBox(width: 6),
-                    Text(
-                      item.label,
-                      style: const TextStyle(
-                        color: AppColors.onLime,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
+              child: ClipRect(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      item.icon,
+                      size: 18,
+                      color: isSelected ? AppColors.onLime : AppColors.text,
                     ),
+                    if (isSelected) ...[
+                      const SizedBox(width: 4),
+                      Flexible(
+                        child: Text(
+                          item.label,
+                          maxLines: 1,
+                          overflow: TextOverflow.clip,
+                          softWrap: false,
+                          style: const TextStyle(
+                            color: AppColors.onLime,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
             ),
           );
