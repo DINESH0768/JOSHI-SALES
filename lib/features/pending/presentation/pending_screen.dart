@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:drift/drift.dart' show OrderingTerm;
 import '../../../core/theme/app_colors.dart';
 import '../../../data/db/app_database.dart';
@@ -258,7 +259,22 @@ class _PendingScreenState extends State<PendingScreen> {
                                     ),
                                   ),
                                 ),
-                                const SizedBox(width: 8),
+                                const SizedBox(width: 6),
+                                Expanded(
+                                  child: GestureDetector(
+                                    onTap: () => context.push('/payments/upi/${slips.first.id}'),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(vertical: 6),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.surface3,
+                                        borderRadius: BorderRadius.circular(10),
+                                      ),
+                                      alignment: Alignment.center,
+                                      child: const Text('Show QR', style: TextStyle(color: AppColors.text, fontSize: 11)),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 6),
                                 Expanded(
                                   child: GestureDetector(
                                     onTap: () => _onMoveToUdhar(slips.first),
@@ -269,7 +285,7 @@ class _PendingScreenState extends State<PendingScreen> {
                                         border: Border.all(color: AppColors.border, width: 0.5),
                                       ),
                                       alignment: Alignment.center,
-                                      child: const Text('Move to Udhar', style: TextStyle(color: AppColors.text, fontSize: 11)),
+                                      child: const Text('Move Udhar', style: TextStyle(color: AppColors.text, fontSize: 11)),
                                     ),
                                   ),
                                 ),

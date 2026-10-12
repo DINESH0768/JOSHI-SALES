@@ -6,6 +6,7 @@ import '../../data/db/app_database.dart';
 import '../../features/home/presentation/home_screen.dart';
 import '../../features/income/presentation/aaj_ki_income_screen.dart';
 import '../../features/payments/presentation/payment_post_save_screen.dart';
+import '../../features/payments/presentation/upi_payment_screen.dart';
 import '../../features/pending/presentation/pending_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/slips/presentation/new_slip_screen.dart';
@@ -52,6 +53,13 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/income/today',
       builder: (context, state) => AajKiIncomeScreen(db: _db),
+    ),
+    GoRoute(
+      path: '/payments/upi/:slipId',
+      builder: (context, state) {
+        final slipId = state.pathParameters['slipId'] ?? '';
+        return UpiPaymentScreen(slipId: slipId, db: _db);
+      },
     ),
     GoRoute(
       path: '/udhar/customer/:id',

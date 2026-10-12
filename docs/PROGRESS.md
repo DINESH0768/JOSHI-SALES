@@ -59,3 +59,15 @@
   - Recorded Udhar Jama payments as income on the exact date received (`payments.kind = 'udhar_jama'`).
   - Added unit tests in `test/udhar_service_test.dart` for 40-slip oldest-first allocation and J-0001 receipt creation, and widget tests in `test/jama_rasid_widget_test.dart`.
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 27 tests passing).
+
+## Milestone 6: UPI QR Payments & Screen Brightness
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented `UpiService` (`lib/features/payments/domain/services/upi_service.dart`) for standard UPI URI generation (`upi://pay?pa=...`) and secure storage management.
+  - Implemented `UpiPaymentScreen` (`lib/features/payments/presentation/upi_payment_screen.dart`) matching Screen 11 design specs (dark theme layout, Cash/UPI/Udhar segmented bar, white rounded QR card, pulsing lime dot, quick chips, and safety notice).
+  - Integrated `screen_brightness` package to maximize brightness when opening `UpiPaymentScreen` and restore previous level on exit.
+  - Added "Show QR" button triggers to `SlipCardScreen`, `PendingScreen`, and `CustomerDetailScreen`.
+  - Updated `SettingsScreen` to support entering/saving UPI ID in secure storage and importing static QR image via `image_picker`.
+  - Documented setup instructions in `README.md`.
+  - Added unit tests in `test/upi_service_test.dart` and widget tests in `test/upi_payment_test.dart`.
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 29 tests passing).
