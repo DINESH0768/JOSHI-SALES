@@ -3,6 +3,8 @@ import 'package:go_router/go_router.dart';
 import '../../core/widgets/floating_bottom_nav.dart';
 import '../../core/widgets/placeholder_screen.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/splash/presentation/splash_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final GlobalKey<NavigatorState> _shellNavigatorKey = GlobalKey<NavigatorState>();
@@ -11,6 +13,14 @@ final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/home',
   routes: [
+    GoRoute(
+      path: '/splash',
+      builder: (context, state) => const SplashScreen(),
+    ),
+    GoRoute(
+      path: '/settings',
+      builder: (context, state) => const SettingsScreen(),
+    ),
     ShellRoute(
       navigatorKey: _shellNavigatorKey,
       builder: (context, state, child) {

@@ -42,7 +42,7 @@ class _LockScreenState extends State<LockScreen> {
         }
       }
     } catch (_) {
-      // Biometrics fallback to PIN
+      // Biometrics fallback
     }
   }
 
@@ -69,7 +69,12 @@ class _LockScreenState extends State<LockScreen> {
   }
 
   Future<void> _verifyPin() async {
-    final savedPin = await _storage.read(key: 'user_pin') ?? '1234';
+    String? savedPin;
+    try {
+      savedPin = await _storage.read(key: 'user_pin');
+    } catch (_) {}
+    savedPin ??= '1234';
+
     if (_enteredPin == savedPin) {
       widget.onUnlocked();
     } else {
@@ -85,27 +90,30 @@ class _LockScreenState extends State<LockScreen> {
     }
   }
 
-  Widget _buildKeypadButton(String text, {VoidCallback? onTap, Widget? icon}) {
-    return InkWell(
-      onTap: onTap ?? () => _onKeyPress(text),
-      borderRadius: BorderRadius.circular(36),
-      child: Container(
-        width: 68,
-        height: 68,
-        alignment: Alignment.center,
-        decoration: const BoxDecoration(
-          color: AppColors.surface2,
-          shape: BoxShape.circle,
-        ),
-        child: icon ??
-            Text(
-              text,
-              style: const TextStyle(
-                color: AppColors.text,
-                fontSize: 24,
-                fontWeight: FontWeight.w600,
+  Widget _buildKeypadButton({String? text, VoidCallback? onTap, Widget? icon}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap ?? (text != null ? () => _onKeyPress(text) : null),
+        borderRadius: BorderRadius.circular(29),
+        child: Container(
+          width: 58,
+          height: 58,
+          alignment: Alignment.center,
+          decoration: const BoxDecoration(
+            color: AppColors.surface2,
+            shape: BoxShape.circle,
+          ),
+          child: icon ??
+              Text(
+                text ?? '',
+                style: const TextStyle(
+                  color: AppColors.text,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w400,
+                ),
               ),
-            ),
+        ),
       ),
     );
   }
@@ -115,122 +123,134 @@ class _LockScreenState extends State<LockScreen> {
     return Scaffold(
       backgroundColor: AppColors.bg,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Spacer(),
-              Container(
-                width: 72,
-                height: 72,
-                decoration: BoxDecoration(
-                  color: AppColors.surface2,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: AppColors.border, width: 0.5),
+        child: Center(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 10),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                // Logo Icon Square
+                Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(13),
+                  ),
+                  clipBehavior: Clip.antiAlias,
+                  child: Image.asset('assets/branding/app_icon_dark.png'),
                 ),
-                child: Image.asset('assets/branding/app_icon_dark.png'),
-              ),
-              const SizedBox(height: 20),
-              const Text(
-                'Kanta Slip Security',
-                style: TextStyle(
-                  color: AppColors.text,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
+                const SizedBox(height: 10),
+                const Text(
+                  'Kanta Slip lock',
+                  style: TextStyle(
+                    color: AppColors.text,
+                    fontSize: 15,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'PIN ya Fingerprint se unlock karein',
-                style: TextStyle(color: AppColors.muted, fontSize: 14),
-              ),
-              const SizedBox(height: 32),
+                const SizedBox(height: 4),
+                const Text(
+                  'PIN daalo ya fingerprint lagao',
+                  style: TextStyle(
+                    color: AppColors.muted,
+                    fontSize: 11,
+                  ),
+                ),
+                const SizedBox(height: 22),
 
-              // PIN dots
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: List.generate(4, (index) {
-                  final isFilled = index < _enteredPin.length;
-                  return Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 10),
-                    width: 16,
-                    height: 16,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: isFilled ? AppColors.lime : AppColors.surface3,
-                      border: Border.all(
-                        color: isFilled ? AppColors.lime : AppColors.border,
-                        width: 1,
+                // PIN dots
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: List.generate(4, (index) {
+                    final isFilled = index < _enteredPin.length;
+                    return Container(
+                      margin: const EdgeInsets.symmetric(horizontal: 7),
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: isFilled ? AppColors.lime : Colors.transparent,
+                        border: Border.all(
+                          color: isFilled ? AppColors.lime : const Color(0xFF3A3A3F),
+                          width: 1.5,
+                        ),
                       ),
-                    ),
-                  );
-                }),
-              ),
-
-              const SizedBox(height: 16),
-              SizedBox(
-                height: 20,
-                child: _errorText.isNotEmpty
-                    ? Text(_errorText, style: const TextStyle(color: AppColors.danger, fontSize: 13))
-                    : null,
-              ),
-
-              const Spacer(),
-
-              // Numeric Keypad (1-9, 0, backspace, fingerprint)
-              SizedBox(
-                width: 260,
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildKeypadButton('1'),
-                        _buildKeypadButton('2'),
-                        _buildKeypadButton('3'),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildKeypadButton('4'),
-                        _buildKeypadButton('5'),
-                        _buildKeypadButton('6'),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildKeypadButton('7'),
-                        _buildKeypadButton('8'),
-                        _buildKeypadButton('9'),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _buildKeypadButton(
-                          '',
-                          onTap: _checkBiometrics,
-                          icon: const Icon(Icons.fingerprint, color: AppColors.lime, size: 28),
-                        ),
-                        _buildKeypadButton('0'),
-                        _buildKeypadButton(
-                          '',
-                          onTap: _onBackspace,
-                          icon: const Icon(Icons.backspace_outlined, color: AppColors.text, size: 22),
-                        ),
-                      ],
-                    ),
-                  ],
+                    );
+                  }),
                 ),
-              ),
-              const Spacer(),
-            ],
+
+                const SizedBox(height: 12),
+                SizedBox(
+                  height: 18,
+                  child: _errorText.isNotEmpty
+                      ? Text(
+                          _errorText,
+                          style: const TextStyle(color: AppColors.danger, fontSize: 12),
+                        )
+                      : null,
+                ),
+
+                const SizedBox(height: 14),
+
+                // Keypad Grid 3x4
+                SizedBox(
+                  width: 240,
+                  child: Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildKeypadButton(text: '1'),
+                          _buildKeypadButton(text: '2'),
+                          _buildKeypadButton(text: '3'),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildKeypadButton(text: '4'),
+                          _buildKeypadButton(text: '5'),
+                          _buildKeypadButton(text: '6'),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildKeypadButton(text: '7'),
+                          _buildKeypadButton(text: '8'),
+                          _buildKeypadButton(text: '9'),
+                        ],
+                      ),
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          _buildKeypadButton(
+                            onTap: _checkBiometrics,
+                            icon: const Icon(
+                              Icons.fingerprint_rounded,
+                              color: AppColors.lime,
+                              size: 22,
+                            ),
+                          ),
+                          _buildKeypadButton(text: '0'),
+                          _buildKeypadButton(
+                            onTap: _onBackspace,
+                            icon: const Icon(
+                              Icons.chevron_left_rounded,
+                              color: AppColors.text,
+                              size: 24,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

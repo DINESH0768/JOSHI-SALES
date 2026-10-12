@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:kanta_slip/features/lock/presentation/lock_screen.dart';
 
 void main() {
+  setUp(() {
+    FlutterSecureStorage.setMockInitialValues({});
+  });
+
   testWidgets('LockScreen renders keypad digits and fingerprint icon', (tester) async {
     await tester.pumpWidget(
       MaterialApp(
@@ -12,7 +17,7 @@ void main() {
       ),
     );
 
-    expect(find.text('Kanta Slip Security'), findsOneWidget);
+    expect(find.text('Kanta Slip lock'), findsOneWidget);
     expect(find.text('1'), findsOneWidget);
     expect(find.text('2'), findsOneWidget);
     expect(find.text('3'), findsOneWidget);
@@ -23,8 +28,8 @@ void main() {
     expect(find.text('8'), findsOneWidget);
     expect(find.text('9'), findsOneWidget);
     expect(find.text('0'), findsOneWidget);
-    expect(find.byIcon(Icons.fingerprint), findsOneWidget);
-    expect(find.byIcon(Icons.backspace_outlined), findsOneWidget);
+    expect(find.byIcon(Icons.fingerprint_rounded), findsOneWidget);
+    expect(find.byIcon(Icons.chevron_left_rounded), findsOneWidget);
   });
 
   testWidgets('Entering correct 4-digit PIN triggers onUnlocked', (tester) async {
@@ -78,5 +83,7 @@ void main() {
 
     expect(find.text('Galat PIN, phir se koshish karein'), findsOneWidget);
     expect(unlocked, isFalse);
+
+    await tester.pump(const Duration(milliseconds: 300));
   });
 }
