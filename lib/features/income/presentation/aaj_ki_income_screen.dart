@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/db/app_database.dart';
@@ -132,6 +133,24 @@ class _AajKiIncomeScreenState extends State<AajKiIncomeScreen> {
                   const SizedBox(width: 10),
                   const Text('Aaj ki income', style: TextStyle(color: AppColors.text, fontSize: 15, fontWeight: FontWeight.w500)),
                   const Spacer(),
+                  GestureDetector(
+                    onTap: () => context.push('/income/history'),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: AppColors.surface3,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Row(
+                        children: [
+                          Icon(Icons.show_chart_rounded, color: AppColors.lime, size: 13),
+                          SizedBox(width: 4),
+                          Text('History', style: TextStyle(color: AppColors.lime, fontSize: 11, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
                   GestureDetector(
                     onTap: _selectDate,
                     child: Container(

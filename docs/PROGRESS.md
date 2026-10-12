@@ -86,3 +86,13 @@
   - Wired `/kharcha`, `/kharcha/suppliers`, and `/kharcha/suppliers/:id` in `app_router.dart`.
   - Added unit tests (`test/expense_service_test.dart`, `test/supplier_service_test.dart`) and widget tests (`test/kharcha_widget_test.dart`).
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 34 tests passing).
+
+## Milestone 8: Earning History Graph & Range Analytics
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented `EarningHistoryService` (`lib/features/income/domain/services/earning_history_service.dart`) for range calculations (7 days, 15 days, 30 days, custom month), daily payment aggregation (Cash vs UPI counts and amounts), previous period percentage change calculations ($\frac{\text{current} - \text{prev}}{\text{prev}} \times 100$), and Indian currency notation formatting (e.g. `1,84,500`).
+  - Built `KamaiHistoryScreen` (`lib/features/income/presentation/kamai_history_screen.dart`) matching Screen 5 design specs (big total header "Pichle N din ki kamai", range chips 7d/15d/30d/Month, smooth curved line graph using `fl_chart`, lime `#C6F432` line with area fill, touch tooltip bubble, ring indicator dot, metric toggle for Kamai/Kharcha/Bachat, dark-green comparison card "Usse pehle ke N din" with % change badge, and selected day breakdown card).
+  - Integrated `/income/history` route in `app_router.dart` and connected entry points from Home screen "See all" and `AajKiIncomeScreen` header.
+  - Handled reduced motion settings (`MediaQuery.of(context).disableAnimations`) and 1.3x text scaling without overflow.
+  - Added unit tests (`test/earning_history_service_test.dart`) and widget tests (`test/kamai_history_widget_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 38 tests passing).

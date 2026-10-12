@@ -229,7 +229,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const Text('Latest income list', style: TextStyle(color: AppColors.lightText, fontSize: 13, fontWeight: FontWeight.bold)),
                       GestureDetector(
-                        onTap: () => context.push('/income/today'),
+                        onTap: () => context.push('/income/history'),
                         child: const Text('See all', style: TextStyle(color: AppColors.lightText, fontSize: 11, fontWeight: FontWeight.w500)),
                       ),
                     ],
