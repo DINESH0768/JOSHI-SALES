@@ -9,7 +9,10 @@ import '../../features/payments/presentation/payment_post_save_screen.dart';
 import '../../features/payments/presentation/upi_payment_screen.dart';
 import '../../features/pending/presentation/pending_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
+import '../../features/slips/domain/services/ocr_parser.dart';
+import '../../features/slips/presentation/auto_scan_screen.dart';
 import '../../features/slips/presentation/new_slip_screen.dart';
+import '../../features/slips/presentation/scan_result_screen.dart';
 import '../../features/slips/presentation/slip_card_screen.dart';
 import '../../features/slips/presentation/slips_list_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
@@ -38,6 +41,20 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/slips/new',
       builder: (context, state) => NewSlipScreen(db: _db),
+    ),
+    GoRoute(
+      path: '/slips/scan',
+      builder: (context, state) => AutoScanScreen(db: _db),
+    ),
+    GoRoute(
+      path: '/slips/scan-result',
+      builder: (context, state) {
+        final extra = state.extra as ScannedSlipData?;
+        final data = extra ??
+            OcrParser.parseText(
+                'रसीद नं. 1031\n11/10/2026\nमोहन लाल\nRJ 31 GA 0987\nगेहूं\nवाहन सहित माल 52,350 kg\nखाली तुलाने पर 13,450 kg');
+        return ScanResultScreen(scannedData: data, db: _db);
+      },
     ),
     GoRoute(
       path: '/slips/card/:id',

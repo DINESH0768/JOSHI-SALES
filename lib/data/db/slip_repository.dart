@@ -64,6 +64,14 @@ class SlipRepository {
     return (counter?.currentValue ?? 1031) + 1;
   }
 
+  /// Get slip by receipt number
+  Future<SlipsTableData?> getSlipByReceiptNo(int receiptNo) async {
+    return (db.select(db.slipsTable)
+          ..where((t) => t.receiptNo.equals(receiptNo))
+          ..where((t) => t.deletedAt.isNull()))
+        .getSingleOrNull();
+  }
+
   /// Insert slip and its rounds inside a transaction
   Future<String> saveSlip({
     required int receiptNo,
@@ -72,6 +80,7 @@ class SlipRepository {
     String? vehicleNo,
     required double totalNetWeight,
     required double charge,
+    String? scanPhotoPath,
     required List<Map<String, dynamic>> rounds,
   }) async {
     final slipId = 'slip_${DateTime.now().millisecondsSinceEpoch}';
@@ -86,6 +95,7 @@ class SlipRepository {
               vehicleNo: Value(vehicleNo),
               charge: charge.toInt(),
               status: 'pending',
+              scanPhotoPath: Value(scanPhotoPath),
               createdAt: DateTime.now(),
               updatedAt: DateTime.now(),
             ),

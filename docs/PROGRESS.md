@@ -96,3 +96,14 @@
   - Handled reduced motion settings (`MediaQuery.of(context).disableAnimations`) and 1.3x text scaling without overflow.
   - Added unit tests (`test/earning_history_service_test.dart`) and widget tests (`test/kamai_history_widget_test.dart`).
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 38 tests passing).
+
+## Milestone 9: Auto Scan (Camera/Gallery OCR) & Scan Result
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented `OcrParser` (`lib/features/slips/domain/services/ocr_parser.dart`) for extracting receipt no, date, customer name, vehicle no, material, gross weight, tare weight, and confidence ratings from Devanagari & Latin text with auto-recomputed net weight (`gross - tare`).
+  - Implemented `OcrVotingService` (`lib/features/slips/domain/services/ocr_voting_service.dart`) for multi-frame OCR voting aggregation and steady match detection (~1 second auto-capture).
+  - Built `AutoScanScreen` (`lib/features/slips/presentation/auto_scan_screen.dart`) matching Screen 7 design specs (full-screen camera stream, lime corner brackets, moving scan line, live detected field chips, flash toggle, 5-second timeout hints, gallery picker, and manual entry fallback).
+  - Built `ScanResultScreen` (`lib/features/slips/presentation/scan_result_screen.dart`) matching Screen 8 design specs (paper slip summary card, green tick / orange "Check karo" confidence badges, tap-to-edit modal, auto net weight recomputation, required lime Charge field, duplicate receipt warning banner, and save redirection to Milestone 3 payment flow).
+  - Registered `/slips/scan` and `/slips/scan-result` in `app_router.dart` and connected "Scan slip" button on `HomeScreen`.
+  - Added unit tests (`test/ocr_parser_test.dart`) with 3-4 sample Devanagari & English weighbridge slips, voting logic, confidence tagging, net weight recomputation, duplicate receipt checking, and widget tests (`test/auto_scan_widget_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 44 tests passing).
