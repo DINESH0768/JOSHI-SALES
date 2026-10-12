@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
+import 'package:kanta_slip/core/theme/app_colors.dart';
 
 class FloatingBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -30,7 +30,7 @@ class FloatingBottomNav extends StatelessWidget {
         border: Border.all(color: AppColors.border, width: 0.5),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.4),
+            color: Colors.black.withValues(alpha: 0.4),
             blurRadius: 16,
             offset: const Offset(0, 6),
           ),

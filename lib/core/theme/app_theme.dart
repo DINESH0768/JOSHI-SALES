@@ -18,7 +18,7 @@ class AppTheme {
         error: AppColors.danger,
       ),
       fontFamily: 'Inter',
-      cardTheme: CardTheme(
+      cardTheme: CardThemeData(
         color: AppColors.surface,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(18),

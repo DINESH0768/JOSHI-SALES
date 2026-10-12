@@ -7234,11 +7234,11 @@ class $AuditLogTableTable extends AuditLogTable
   late final GeneratedColumn<String> id = GeneratedColumn<String>(
       'id', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
-  static const VerificationMeta _entityNameMeta =
-      const VerificationMeta('entityName');
+  static const VerificationMeta _targetTypeMeta =
+      const VerificationMeta('targetType');
   @override
-  late final GeneratedColumn<String> entityName = GeneratedColumn<String>(
-      'entity_name', aliasedName, false,
+  late final GeneratedColumn<String> targetType = GeneratedColumn<String>(
+      'target_type', aliasedName, false,
       type: DriftSqlType.string, requiredDuringInsert: true);
   static const VerificationMeta _entityIdMeta =
       const VerificationMeta('entityId');
@@ -7265,7 +7265,7 @@ class $AuditLogTableTable extends AuditLogTable
       type: DriftSqlType.dateTime, requiredDuringInsert: true);
   @override
   List<GeneratedColumn> get $columns =>
-      [id, entityName, entityId, action, detailsJson, createdAt];
+      [id, targetType, entityId, action, detailsJson, createdAt];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -7281,13 +7281,13 @@ class $AuditLogTableTable extends AuditLogTable
     } else if (isInserting) {
       context.missing(_idMeta);
     }
-    if (data.containsKey('entity_name')) {
+    if (data.containsKey('target_type')) {
       context.handle(
-          _entityNameMeta,
-          entityName.isAcceptableOrUnknown(
-              data['entity_name']!, _entityNameMeta));
+          _targetTypeMeta,
+          targetType.isAcceptableOrUnknown(
+              data['target_type']!, _targetTypeMeta));
     } else if (isInserting) {
-      context.missing(_entityNameMeta);
+      context.missing(_targetTypeMeta);
     }
     if (data.containsKey('entity_id')) {
       context.handle(_entityIdMeta,
@@ -7326,8 +7326,8 @@ class $AuditLogTableTable extends AuditLogTable
     return AuditLogTableData(
       id: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}id'])!,
-      entityName: attachedDatabase.typeMapping
-          .read(DriftSqlType.string, data['${effectivePrefix}entity_name'])!,
+      targetType: attachedDatabase.typeMapping
+          .read(DriftSqlType.string, data['${effectivePrefix}target_type'])!,
       entityId: attachedDatabase.typeMapping
           .read(DriftSqlType.string, data['${effectivePrefix}entity_id'])!,
       action: attachedDatabase.typeMapping
@@ -7348,14 +7348,14 @@ class $AuditLogTableTable extends AuditLogTable
 class AuditLogTableData extends DataClass
     implements Insertable<AuditLogTableData> {
   final String id;
-  final String entityName;
+  final String targetType;
   final String entityId;
   final String action;
   final String detailsJson;
   final DateTime createdAt;
   const AuditLogTableData(
       {required this.id,
-      required this.entityName,
+      required this.targetType,
       required this.entityId,
       required this.action,
       required this.detailsJson,
@@ -7364,7 +7364,7 @@ class AuditLogTableData extends DataClass
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<String>(id);
-    map['entity_name'] = Variable<String>(entityName);
+    map['target_type'] = Variable<String>(targetType);
     map['entity_id'] = Variable<String>(entityId);
     map['action'] = Variable<String>(action);
     map['details_json'] = Variable<String>(detailsJson);
@@ -7375,7 +7375,7 @@ class AuditLogTableData extends DataClass
   AuditLogTableCompanion toCompanion(bool nullToAbsent) {
     return AuditLogTableCompanion(
       id: Value(id),
-      entityName: Value(entityName),
+      targetType: Value(targetType),
       entityId: Value(entityId),
       action: Value(action),
       detailsJson: Value(detailsJson),
@@ -7388,7 +7388,7 @@ class AuditLogTableData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return AuditLogTableData(
       id: serializer.fromJson<String>(json['id']),
-      entityName: serializer.fromJson<String>(json['entityName']),
+      targetType: serializer.fromJson<String>(json['targetType']),
       entityId: serializer.fromJson<String>(json['entityId']),
       action: serializer.fromJson<String>(json['action']),
       detailsJson: serializer.fromJson<String>(json['detailsJson']),
@@ -7400,7 +7400,7 @@ class AuditLogTableData extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<String>(id),
-      'entityName': serializer.toJson<String>(entityName),
+      'targetType': serializer.toJson<String>(targetType),
       'entityId': serializer.toJson<String>(entityId),
       'action': serializer.toJson<String>(action),
       'detailsJson': serializer.toJson<String>(detailsJson),
@@ -7410,14 +7410,14 @@ class AuditLogTableData extends DataClass
 
   AuditLogTableData copyWith(
           {String? id,
-          String? entityName,
+          String? targetType,
           String? entityId,
           String? action,
           String? detailsJson,
           DateTime? createdAt}) =>
       AuditLogTableData(
         id: id ?? this.id,
-        entityName: entityName ?? this.entityName,
+        targetType: targetType ?? this.targetType,
         entityId: entityId ?? this.entityId,
         action: action ?? this.action,
         detailsJson: detailsJson ?? this.detailsJson,
@@ -7426,8 +7426,8 @@ class AuditLogTableData extends DataClass
   AuditLogTableData copyWithCompanion(AuditLogTableCompanion data) {
     return AuditLogTableData(
       id: data.id.present ? data.id.value : this.id,
-      entityName:
-          data.entityName.present ? data.entityName.value : this.entityName,
+      targetType:
+          data.targetType.present ? data.targetType.value : this.targetType,
       entityId: data.entityId.present ? data.entityId.value : this.entityId,
       action: data.action.present ? data.action.value : this.action,
       detailsJson:
@@ -7440,7 +7440,7 @@ class AuditLogTableData extends DataClass
   String toString() {
     return (StringBuffer('AuditLogTableData(')
           ..write('id: $id, ')
-          ..write('entityName: $entityName, ')
+          ..write('targetType: $targetType, ')
           ..write('entityId: $entityId, ')
           ..write('action: $action, ')
           ..write('detailsJson: $detailsJson, ')
@@ -7451,13 +7451,13 @@ class AuditLogTableData extends DataClass
 
   @override
   int get hashCode =>
-      Object.hash(id, entityName, entityId, action, detailsJson, createdAt);
+      Object.hash(id, targetType, entityId, action, detailsJson, createdAt);
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is AuditLogTableData &&
           other.id == this.id &&
-          other.entityName == this.entityName &&
+          other.targetType == this.targetType &&
           other.entityId == this.entityId &&
           other.action == this.action &&
           other.detailsJson == this.detailsJson &&
@@ -7466,7 +7466,7 @@ class AuditLogTableData extends DataClass
 
 class AuditLogTableCompanion extends UpdateCompanion<AuditLogTableData> {
   final Value<String> id;
-  final Value<String> entityName;
+  final Value<String> targetType;
   final Value<String> entityId;
   final Value<String> action;
   final Value<String> detailsJson;
@@ -7474,7 +7474,7 @@ class AuditLogTableCompanion extends UpdateCompanion<AuditLogTableData> {
   final Value<int> rowid;
   const AuditLogTableCompanion({
     this.id = const Value.absent(),
-    this.entityName = const Value.absent(),
+    this.targetType = const Value.absent(),
     this.entityId = const Value.absent(),
     this.action = const Value.absent(),
     this.detailsJson = const Value.absent(),
@@ -7483,21 +7483,21 @@ class AuditLogTableCompanion extends UpdateCompanion<AuditLogTableData> {
   });
   AuditLogTableCompanion.insert({
     required String id,
-    required String entityName,
+    required String targetType,
     required String entityId,
     required String action,
     required String detailsJson,
     required DateTime createdAt,
     this.rowid = const Value.absent(),
   })  : id = Value(id),
-        entityName = Value(entityName),
+        targetType = Value(targetType),
         entityId = Value(entityId),
         action = Value(action),
         detailsJson = Value(detailsJson),
         createdAt = Value(createdAt);
   static Insertable<AuditLogTableData> custom({
     Expression<String>? id,
-    Expression<String>? entityName,
+    Expression<String>? targetType,
     Expression<String>? entityId,
     Expression<String>? action,
     Expression<String>? detailsJson,
@@ -7506,7 +7506,7 @@ class AuditLogTableCompanion extends UpdateCompanion<AuditLogTableData> {
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (entityName != null) 'entity_name': entityName,
+      if (targetType != null) 'target_type': targetType,
       if (entityId != null) 'entity_id': entityId,
       if (action != null) 'action': action,
       if (detailsJson != null) 'details_json': detailsJson,
@@ -7517,7 +7517,7 @@ class AuditLogTableCompanion extends UpdateCompanion<AuditLogTableData> {
 
   AuditLogTableCompanion copyWith(
       {Value<String>? id,
-      Value<String>? entityName,
+      Value<String>? targetType,
       Value<String>? entityId,
       Value<String>? action,
       Value<String>? detailsJson,
@@ -7525,7 +7525,7 @@ class AuditLogTableCompanion extends UpdateCompanion<AuditLogTableData> {
       Value<int>? rowid}) {
     return AuditLogTableCompanion(
       id: id ?? this.id,
-      entityName: entityName ?? this.entityName,
+      targetType: targetType ?? this.targetType,
       entityId: entityId ?? this.entityId,
       action: action ?? this.action,
       detailsJson: detailsJson ?? this.detailsJson,
@@ -7540,8 +7540,8 @@ class AuditLogTableCompanion extends UpdateCompanion<AuditLogTableData> {
     if (id.present) {
       map['id'] = Variable<String>(id.value);
     }
-    if (entityName.present) {
-      map['entity_name'] = Variable<String>(entityName.value);
+    if (targetType.present) {
+      map['target_type'] = Variable<String>(targetType.value);
     }
     if (entityId.present) {
       map['entity_id'] = Variable<String>(entityId.value);
@@ -7565,7 +7565,7 @@ class AuditLogTableCompanion extends UpdateCompanion<AuditLogTableData> {
   String toString() {
     return (StringBuffer('AuditLogTableCompanion(')
           ..write('id: $id, ')
-          ..write('entityName: $entityName, ')
+          ..write('targetType: $targetType, ')
           ..write('entityId: $entityId, ')
           ..write('action: $action, ')
           ..write('detailsJson: $detailsJson, ')
@@ -10546,7 +10546,7 @@ class $$CountersTableTableOrderingComposer
 typedef $$AuditLogTableTableCreateCompanionBuilder = AuditLogTableCompanion
     Function({
   required String id,
-  required String entityName,
+  required String targetType,
   required String entityId,
   required String action,
   required String detailsJson,
@@ -10556,7 +10556,7 @@ typedef $$AuditLogTableTableCreateCompanionBuilder = AuditLogTableCompanion
 typedef $$AuditLogTableTableUpdateCompanionBuilder = AuditLogTableCompanion
     Function({
   Value<String> id,
-  Value<String> entityName,
+  Value<String> targetType,
   Value<String> entityId,
   Value<String> action,
   Value<String> detailsJson,
@@ -10582,7 +10582,7 @@ class $$AuditLogTableTableTableManager extends RootTableManager<
               $$AuditLogTableTableOrderingComposer(ComposerState(db, table)),
           updateCompanionCallback: ({
             Value<String> id = const Value.absent(),
-            Value<String> entityName = const Value.absent(),
+            Value<String> targetType = const Value.absent(),
             Value<String> entityId = const Value.absent(),
             Value<String> action = const Value.absent(),
             Value<String> detailsJson = const Value.absent(),
@@ -10591,7 +10591,7 @@ class $$AuditLogTableTableTableManager extends RootTableManager<
           }) =>
               AuditLogTableCompanion(
             id: id,
-            entityName: entityName,
+            targetType: targetType,
             entityId: entityId,
             action: action,
             detailsJson: detailsJson,
@@ -10600,7 +10600,7 @@ class $$AuditLogTableTableTableManager extends RootTableManager<
           ),
           createCompanionCallback: ({
             required String id,
-            required String entityName,
+            required String targetType,
             required String entityId,
             required String action,
             required String detailsJson,
@@ -10609,7 +10609,7 @@ class $$AuditLogTableTableTableManager extends RootTableManager<
           }) =>
               AuditLogTableCompanion.insert(
             id: id,
-            entityName: entityName,
+            targetType: targetType,
             entityId: entityId,
             action: action,
             detailsJson: detailsJson,
@@ -10627,8 +10627,8 @@ class $$AuditLogTableTableFilterComposer
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
-  ColumnFilters<String> get entityName => $state.composableBuilder(
-      column: $state.table.entityName,
+  ColumnFilters<String> get targetType => $state.composableBuilder(
+      column: $state.table.targetType,
       builder: (column, joinBuilders) =>
           ColumnFilters(column, joinBuilders: joinBuilders));
 
@@ -10661,8 +10661,8 @@ class $$AuditLogTableTableOrderingComposer
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 
-  ColumnOrderings<String> get entityName => $state.composableBuilder(
-      column: $state.table.entityName,
+  ColumnOrderings<String> get targetType => $state.composableBuilder(
+      column: $state.table.targetType,
       builder: (column, joinBuilders) =>
           ColumnOrderings(column, joinBuilders: joinBuilders));
 

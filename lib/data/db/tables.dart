@@ -226,7 +226,7 @@ class CountersTable extends Table {
 
 class AuditLogTable extends Table {
   TextColumn get id => text()();
-  TextColumn get entityName => text()();
+  TextColumn get targetType => text()();
   TextColumn get entityId => text()();
   TextColumn get action => text()(); // edit, delete
   TextColumn get detailsJson => text()();
