@@ -51,6 +51,18 @@ class HomeScreen extends StatelessWidget {
                       fontWeight: FontWeight.w600,
                     ),
                   ),
+                  const SizedBox(width: 6),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: AppColors.bg,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: const Text(
+                      'v1.0.0+1',
+                      style: TextStyle(color: AppColors.lime, fontSize: 9, fontWeight: FontWeight.bold),
+                    ),
+                  ),
                   const Spacer(),
                   // Plus Action Button (34x34 circle with #0B0B0C background and #C6F432 plus icon)
                   GestureDetector(

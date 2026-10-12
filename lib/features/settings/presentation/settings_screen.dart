@@ -319,7 +319,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               // Version label (.m)
               const Text(
-                'Kanta Slip v1.0',
+                'Kanta Slip v1.0.0+1',
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: AppColors.muted,
