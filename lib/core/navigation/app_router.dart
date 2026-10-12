@@ -4,6 +4,9 @@ import '../../core/widgets/floating_bottom_nav.dart';
 import '../../core/widgets/placeholder_screen.dart';
 import '../../data/db/app_database.dart';
 import '../../features/home/presentation/home_screen.dart';
+import '../../features/income/presentation/aaj_ki_income_screen.dart';
+import '../../features/payments/presentation/payment_post_save_screen.dart';
+import '../../features/pending/presentation/pending_screen.dart';
 import '../../features/settings/presentation/settings_screen.dart';
 import '../../features/slips/presentation/new_slip_screen.dart';
 import '../../features/slips/presentation/slip_card_screen.dart';
@@ -36,6 +39,17 @@ final appRouter = GoRouter(
         return SlipCardScreen(slipId: id, db: _db);
       },
     ),
+    GoRoute(
+      path: '/payments/post-save/:slipId',
+      builder: (context, state) {
+        final slipId = state.pathParameters['slipId'] ?? '';
+        return PaymentPostSaveScreen(slipId: slipId, db: _db);
+      },
+    ),
+    GoRoute(
+      path: '/income/today',
+      builder: (context, state) => AajKiIncomeScreen(db: _db),
+    ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
         return Scaffold(
@@ -65,7 +79,7 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/home',
-              builder: (context, state) => const HomeScreen(),
+              builder: (context, state) => HomeScreen(db: _db),
             ),
           ],
         ),
@@ -81,7 +95,7 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/pending',
-              builder: (context, state) => const PlaceholderScreen(title: 'Pending'),
+              builder: (context, state) => PendingScreen(db: _db),
             ),
           ],
         ),

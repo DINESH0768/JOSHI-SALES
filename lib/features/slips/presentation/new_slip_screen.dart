@@ -234,7 +234,7 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
     await SlipDraftStorage.clearDraft();
 
     if (mounted) {
-      context.go('/slips/card/$slipId');
+      context.go('/payments/post-save/$slipId');
     }
   }
 

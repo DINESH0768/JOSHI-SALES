@@ -22,3 +22,17 @@
   - Created `SlipPdfGenerator` (`lib/features/slips/presentation/slip_pdf_generator.dart`) with `pdf`, `printing`, `share_plus`, and embedded `NotoSansDevanagari` font support for PDF sharing and printing.
   - Connected `/slips/new` and `/slips/card/:id` routes in `app_router.dart` and Home screen header plus action button.
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 15 tests passing).
+
+## Milestone 3: Payment Flow & Income Tracking
+- **Status:** Completed
+- **Changes Summary:**
+  - Configured Android adaptive launcher icons (`#0B0B0C` background, foreground `app_icon_foreground.png`, legacy `app_icon_dark.png`) and Android app label `"Kanta Slip"`.
+  - Added router integration test (`test/navigation_test.dart`) verifying Home '+' button opens `NewSlipScreen`.
+  - Implemented `PaymentService` pure Dart domain service for Cash/UPI payment recording, Pending marking, Udhar allocation, and date-wise income aggregation with unit tests (`test/payment_service_test.dart`).
+  - Created `PaymentPostSaveScreen` (`lib/features/payments/presentation/payment_post_save_screen.dart`) matching Screen 10 design specs ("Payment aaya hai?" -> Haan (Cash/UPI), Nahi (Pending), Udhar khate, and success screens).
+  - Created `PendingScreen` (`lib/features/pending/presentation/pending_screen.dart`) matching Screen 13 design specs (dark orange summary card, total pending amount, party-grouped items, Mark received & Move to Udhar action buttons).
+  - Updated `HomeScreen` (`lib/features/home/presentation/home_screen.dart`) with overlapping "Latest income" card (.ovl), "New slip" and "Scan (jaldi aa raha hai)" buttons, and light rounded sheet (.sheet) for income list.
+  - Created `AajKiIncomeScreen` (`lib/features/income/presentation/aaj_ki_income_screen.dart`) matching Screen 4 design specs (calendar date picker chip, Total mila card with Cash/UPI split bar, Cash/UPI total cards, Cash in hand line, and Sab/Cash/UPI filter chips).
+  - Configured `StatefulShellRoute.indexedStack` in `app_router.dart` to fix tab state persistence and eliminate `RenderFlex` overflow during bottom nav animation.
+  - Displayed app version `v1.0.0+1` on Home header and Settings screen.
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 19 tests passing).
