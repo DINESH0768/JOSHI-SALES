@@ -12,6 +12,9 @@ import '../../features/slips/presentation/new_slip_screen.dart';
 import '../../features/slips/presentation/slip_card_screen.dart';
 import '../../features/slips/presentation/slips_list_screen.dart';
 import '../../features/splash/presentation/splash_screen.dart';
+import '../../features/udhar/presentation/customer_detail_screen.dart';
+import '../../features/udhar/presentation/jama_rasid_screen.dart';
+import '../../features/udhar/presentation/udhar_list_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final AppDatabase _db = AppDatabase();
@@ -49,6 +52,20 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/income/today',
       builder: (context, state) => AajKiIncomeScreen(db: _db),
+    ),
+    GoRoute(
+      path: '/udhar/customer/:id',
+      builder: (context, state) {
+        final id = state.pathParameters['id'] ?? '';
+        return CustomerDetailScreen(customerId: id, db: _db);
+      },
+    ),
+    GoRoute(
+      path: '/udhar/rasid/:paymentId',
+      builder: (context, state) {
+        final paymentId = state.pathParameters['paymentId'] ?? '';
+        return JamaRasidScreen(paymentId: paymentId, db: _db);
+      },
     ),
     StatefulShellRoute.indexedStack(
       builder: (context, state, navigationShell) {
@@ -103,7 +120,7 @@ final appRouter = GoRouter(
           routes: [
             GoRoute(
               path: '/udhar',
-              builder: (context, state) => const PlaceholderScreen(title: 'Udhar'),
+              builder: (context, state) => UdharListScreen(db: _db),
             ),
           ],
         ),

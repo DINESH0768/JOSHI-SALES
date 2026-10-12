@@ -47,3 +47,15 @@
   - Added duplicate slip warning confirmation dialog in `NewSlipScreen` before saving.
   - Added unit tests for reprint count, soft delete/undo, and edit audit logging (`test/slip_management_test.dart`) and widget tests (`test/slips_list_widget_test.dart`).
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 24 tests passing).
+
+## Milestone 5: Udhar (Credit) Account Management & Jama Rasid
+- **Status:** Completed
+- **Changes Summary:**
+  - Added debug demo data seeder in `AppDatabase` for customer "Sonu" with 40 unpaid slips @ ₹50 each (₹2,000 total balance).
+  - Implemented `UdharService` pure Dart domain service for oldest-first Jama payment allocation across unpaid slips, full settlement ("Poora hisaab"), and auto-incrementing `J-0001` Jama receipt counter.
+  - Implemented `UdharListScreen` (`lib/features/udhar/presentation/udhar_list_screen.dart`) matching Screen 14 design specs (total udhar baki card, search bar, + Naya customer dialog, customer list with pending slip count and baki amount).
+  - Implemented `CustomerDetailScreen` (`lib/features/udhar/presentation/customer_detail_screen.dart`) matching Screen 15 design specs (current baki card, Jama/Poora hisaab actions, unpaid slips list ordered oldest-first, payment history).
+  - Implemented `JamaRasidScreen` (`lib/features/udhar/presentation/jama_rasid_screen.dart`) and `JamaRasidPdfGenerator` (`lib/features/udhar/presentation/jama_rasid_pdf_generator.dart`) matching Screen 16 design specs (J-0001 receipt no, prapt rashi, pichla baki, ab baki, cleared slips list, signature asset, share PDF/print).
+  - Recorded Udhar Jama payments as income on the exact date received (`payments.kind = 'udhar_jama'`).
+  - Added unit tests in `test/udhar_service_test.dart` for 40-slip oldest-first allocation and J-0001 receipt creation, and widget tests in `test/jama_rasid_widget_test.dart`.
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 27 tests passing).
