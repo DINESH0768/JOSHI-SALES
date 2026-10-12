@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:path_provider/path_provider.dart';
@@ -42,7 +43,8 @@ class AppDatabase extends _$AppDatabase {
             CountersTableCompanion.insert(name: 'jama_receipt', currentValue: 1),
           );
 
-          // Seed Debug Demo Data for Sonu (40 unpaid slips @ ₹50 = ₹2,000 total)
+          // Seed Debug Demo Data (only in debug mode)
+          if (kDebugMode) {
           const sonuCustId = 'udhar_sonu';
           await into(udharCustomersTable).insert(
             UdharCustomersTableCompanion.insert(
@@ -169,6 +171,7 @@ class AppDatabase extends _$AppDatabase {
                 updatedAt: slipDate,
               ),
             );
+          }
           }
           await into(shopSettingsTable).insert(
             ShopSettingsTableCompanion.insert(

@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../core/services/data_export_service.dart';
+import '../../../core/services/firebase_sync_service.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../data/db/app_database.dart';
 import '../../payments/domain/services/upi_service.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -11,28 +14,54 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsScreenState extends State<SettingsScreen> {
+  late AppDatabase _db;
   bool _upiQrEnabled = true;
   bool _appLockEnabled = true;
   String? _upiId;
   String? _qrImagePath;
+  String _backupStatus = 'Checking...';
+  bool _isSyncing = false;
 
   @override
   void initState() {
     super.initState();
-    _loadUpiSettings();
+    _db = AppDatabase();
+    _loadSettings();
   }
 
-  Future<void> _loadUpiSettings() async {
+  Future<void> _loadSettings() async {
     final upiId = await UpiService.getUpiId();
     final qrPath = await UpiService.getQrImagePath();
     final enabled = await UpiService.isUpiQrEnabled();
+    final status = await FirebaseSyncService.getLastSyncedStatus();
 
     if (mounted) {
       setState(() {
         _upiId = upiId;
         _qrImagePath = qrPath;
         _upiQrEnabled = enabled;
+        _backupStatus = status;
       });
+    }
+  }
+
+  Future<void> _runBackup() async {
+    setState(() => _isSyncing = true);
+    final success = await FirebaseSyncService.syncAll(_db);
+    final status = await FirebaseSyncService.getLastSyncedStatus();
+
+    if (mounted) {
+      setState(() {
+        _isSyncing = false;
+        _backupStatus = status;
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(success ? 'Backup poora ho gaya!' : 'Sync offline mode mein save ho gaya'),
+          backgroundColor: AppColors.surface,
+        ),
+      );
     }
   }
 
@@ -365,13 +394,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                     _buildRow(
                       icon: Icons.cloud_outlined,
-                      title: 'Backup',
-                      subtitle: 'Aakhri backup: aaj 07:12',
+                      title: 'Backup status',
+                      subtitle: 'Aakhri backup: $_backupStatus',
+                      onTap: _runBackup,
                     ),
                     _buildRow(
                       icon: Icons.description_outlined,
-                      title: 'Export',
-                      subtitle: 'PDF / Excel',
+                      title: 'Export & Report',
+                      subtitle: 'PDF Report / JSON Backup',
+                      onTap: () async {
+                        await DataExportService.exportPdfSummaryReport(_db);
+                      },
                       showBorder: false,
                     ),
                   ],
@@ -381,7 +414,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
               // Button: Abhi backup lo (.btn .bd)
               GestureDetector(
-                onTap: () {},
+                onTap: _isSyncing ? null : _runBackup,
                 child: Container(
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   decoration: BoxDecoration(
@@ -389,25 +422,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     borderRadius: BorderRadius.circular(15),
                   ),
                   alignment: Alignment.center,
-                  child: const Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Icon(
-                        Icons.cloud_outlined,
-                        color: AppColors.text,
-                        size: 16,
-                      ),
-                      SizedBox(width: 8),
-                      Text(
-                        'Abhi backup lo',
-                        style: TextStyle(
-                          color: AppColors.text,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w400,
+                  child: _isSyncing
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(color: AppColors.lime, strokeWidth: 2))
+                      : const Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.cloud_outlined,
+                              color: AppColors.text,
+                              size: 16,
+                            ),
+                            SizedBox(width: 8),
+                            Text(
+                              'Abhi backup lo',
+                              style: TextStyle(
+                                color: AppColors.text,
+                                fontSize: 13,
+                                fontWeight: FontWeight.w400,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
-                  ),
                 ),
               ),
               const SizedBox(height: 12),

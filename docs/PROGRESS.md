@@ -107,3 +107,16 @@
   - Registered `/slips/scan` and `/slips/scan-result` in `app_router.dart` and connected "Scan slip" button on `HomeScreen`.
   - Added unit tests (`test/ocr_parser_test.dart`) with 3-4 sample Devanagari & English weighbridge slips, voting logic, confidence tagging, net weight recomputation, duplicate receipt checking, and widget tests (`test/auto_scan_widget_test.dart`).
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 44 tests passing).
+
+## Milestone 10: Cloud Sync, Export/Restore, ProGuard Rules, GitHub Actions Workflow & Polish
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented `FirebaseSyncService` (`lib/core/services/firebase_sync_service.dart`) for offline-first local Drift database synchronization, tracking unsynced local records and last synced timestamp.
+  - Implemented `CloudOcrService` (`lib/features/slips/domain/services/cloud_ocr_service.dart`) for optional non-blocking cloud OCR refinement on low-confidence fields.
+  - Implemented `DataExportService` (`lib/core/services/data_export_service.dart`) supporting full JSON backup export & restore roundtrips, and PDF summary reports covering slips, income, udhar, expenses, supplier khata, bachat, and maal-wise totals.
+  - Guarded debug demo data seeder in `AppDatabase` with `kDebugMode` to ensure production release builds remain clean.
+  - Configured ProGuard rules (`android/app/proguard-rules.pro`), Android release signing using Base64 environment variables (`android/app/build.gradle.kts`), and updated `.gitignore` to strictly ignore keystores and secrets (`*.keystore`, `*.jks`, `.env`, `google-services.json`).
+  - Updated GitHub Actions CI/CD workflow (`.github/workflows/build_apk.yml`) to build signed release APKs (`flutter build apk --release --split-per-abi`) and upload `app-arm64-v8a-release.apk` artifact.
+  - Updated `README.md` with setup steps, Firebase config instructions, UPI QR import, keystore backup procedures, and test execution commands.
+  - Added unit tests (`test/firebase_sync_test.dart`, `test/data_export_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 46 tests passing).

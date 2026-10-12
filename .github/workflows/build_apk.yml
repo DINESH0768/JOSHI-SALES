@@ -1,4 +1,4 @@
-name: Build Android Debug APK
+name: Build Android Release APK
 
 on:
   push:
@@ -37,13 +37,21 @@ jobs:
       - name: Run Unit Tests
         run: flutter test
 
-      - name: Build Debug APK
-        if: always()
-        run: flutter build apk --debug
+      - name: Decode Release Keystore
+        if: env.KEYSTORE_BASE64 != ''
+        run: echo "$KEYSTORE_BASE64" | base64 --decode > android/app/release.keystore
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
-      - name: Upload Debug APK Artifact
-        if: always()
+      - name: Build Release APK
+        run: flutter build apk --release --split-per-abi
+        env:
+          KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+
+      - name: Upload arm64-v8a Release APK Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: kanta-slip-debug-apk
-          path: build/app/outputs/flutter-apk/app-debug.apk
+          name: app-arm64-v8a-release-apk
+          path: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
