@@ -50,7 +50,6 @@ flutter:
   assets:
     - assets/signature.png
     - assets/branding/
-    - assets/fonts/
 
   fonts:
     - family: Inter
