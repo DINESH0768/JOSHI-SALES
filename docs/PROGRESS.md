@@ -71,3 +71,18 @@
   - Documented setup instructions in `README.md`.
   - Added unit tests in `test/upi_service_test.dart` and widget tests in `test/upi_payment_test.dart`.
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 29 tests passing).
+
+## Milestone 7: Kharcha (Expenses) & Supplier Khata
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented `ExpenseService` (`lib/features/kharcha/domain/services/expense_service.dart`) for adding, editing, soft-deleting/undoing expenses, monthly Bachat calculations ($\text{Income Received} - \text{Expenses Paid}$), category proportion breakdowns, and date-wise net Cash in hand calculations ($\text{Cash Received} - \text{Cash Expenses}$).
+  - Implemented `SupplierService` (`lib/features/kharcha/domain/services/supplier_service.dart`) for managing credit suppliers, adding daily entries ("Khate mein jodo"), recording payments ("Paise diye"), calculating running supplier balance ($\text{Entries} - \text{Payments}$), and retrieving transaction history. Enforced rule that supplier entries are liabilities, while payments create linked `expenses` on payment date.
+  - Updated `AppDatabase` seeder in `lib/data/db/app_database.dart` to seed debug supplier "Bhanwar Lal ji" (Chai wale, ₹10/chai) with initial entries and payments leaving ₹360 balance (matching Screen 18).
+  - Built `KharchaScreen` (`lib/features/kharcha/presentation/kharcha_screen.dart`) matching Screen 17 design specs (month picker header, "Is mahine ki bachat" total, Kamai/Kharcha summary cards, category split bar, "+ Naya kharcha" form modal with chips and validation, "Pichle kharche" list with soft delete & Undo, and Supplier Khata summary card).
+  - Built `SupplierListScreen` (`lib/features/kharcha/presentation/supplier_list_screen.dart`) with total dena baki card and "+ Naya supplier" modal.
+  - Built `SupplierDetailScreen` (`lib/features/kharcha/presentation/supplier_detail_screen.dart`) matching Screen 18 specs (supplier avatar, "Abhi dena baki" card, "Aaj ki chai" counter stepper with live calculation, "Khate mein jodo" button, "Paise diye" button with "Poora baki" shortcut and over-payment confirmation, "Poora hisaab" vs "Diye hue paise" tabs).
+  - Implemented `SupplierPdfGenerator` (`lib/features/kharcha/domain/services/supplier_pdf_generator.dart`) for printing and sharing supplier account statements.
+  - Updated `AajKiIncomeScreen` to calculate net Cash in hand as $\text{Cash Received} - \text{Cash Expenses}$.
+  - Wired `/kharcha`, `/kharcha/suppliers`, and `/kharcha/suppliers/:id` in `app_router.dart`.
+  - Added unit tests (`test/expense_service_test.dart`, `test/supplier_service_test.dart`) and widget tests (`test/kharcha_widget_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 34 tests passing).

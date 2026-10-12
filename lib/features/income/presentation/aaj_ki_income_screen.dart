@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/db/app_database.dart';
+import '../../kharcha/domain/services/expense_service.dart';
 import '../../payments/domain/services/payment_service.dart';
 
 class AajKiIncomeScreen extends StatefulWidget {
@@ -15,6 +16,7 @@ class AajKiIncomeScreen extends StatefulWidget {
 
 class _AajKiIncomeScreenState extends State<AajKiIncomeScreen> {
   late PaymentService _paymentService;
+  late ExpenseService _expenseService;
   DateTime _selectedDate = DateTime.now();
 
   int _totalIncome = 0;
@@ -22,6 +24,7 @@ class _AajKiIncomeScreenState extends State<AajKiIncomeScreen> {
   int _upiTotal = 0;
   int _cashCount = 0;
   int _upiCount = 0;
+  int _cashExpenses = 0;
   List<PaymentsTableData> _payments = [];
   bool _isLoading = true;
 
@@ -31,11 +34,13 @@ class _AajKiIncomeScreenState extends State<AajKiIncomeScreen> {
   void initState() {
     super.initState();
     _paymentService = PaymentService(widget.db);
+    _expenseService = ExpenseService(widget.db);
     _loadIncome();
   }
 
   Future<void> _loadIncome() async {
     final summary = await _paymentService.getIncomeSummaryForDate(_selectedDate);
+    final cashExpenses = await _expenseService.getCashExpensesForDate(_selectedDate);
 
     if (mounted) {
       setState(() {
@@ -44,6 +49,7 @@ class _AajKiIncomeScreenState extends State<AajKiIncomeScreen> {
         _upiTotal = summary['upiTotal'] as int;
         _cashCount = summary['cashCount'] as int;
         _upiCount = summary['upiCount'] as int;
+        _cashExpenses = cashExpenses;
         _payments = summary['payments'] as List<PaymentsTableData>;
         _isLoading = false;
       });
@@ -242,7 +248,7 @@ class _AajKiIncomeScreenState extends State<AajKiIncomeScreen> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     const Text('Cash in hand (cash - kharcha)', style: TextStyle(color: AppColors.muted, fontSize: 12)),
-                    Text('₹${NumberFormat('#,##0').format(_cashTotal)}', style: const TextStyle(color: AppColors.text, fontSize: 12, fontWeight: FontWeight.bold)),
+                    Text('₹${NumberFormat('#,##0').format(_cashTotal - _cashExpenses)}', style: const TextStyle(color: AppColors.text, fontSize: 12, fontWeight: FontWeight.bold)),
                   ],
                 ),
               ),
