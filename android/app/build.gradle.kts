@@ -32,25 +32,23 @@ android {
 
     signingConfigs {
         create("release") {
-            val keystoreFile = file("release.keystore")
-            if (keystoreFile.exists()) {
-                storeFile = keystoreFile
-                storePassword = System.getenv("KEYSTORE_PASSWORD") ?: "kanta_slip_pass"
-                keyAlias = System.getenv("KEY_ALIAS") ?: "kanta_slip_key"
-                keyPassword = System.getenv("KEY_PASSWORD") ?: "kanta_slip_pass"
-            } else {
-                // Fallback to debug signing config for release build testing
-                storeFile = signingConfigs.getByName("debug").storeFile
-                storePassword = signingConfigs.getByName("debug").storePassword
-                keyAlias = signingConfigs.getByName("debug").keyAlias
-                keyPassword = signingConfigs.getByName("debug").keyPassword
+            val ksPath = System.getenv("KEYSTORE_PATH") ?: "release.keystore"
+            val ksFile = file(ksPath)
+            if (ksFile.exists()) {
+                storeFile = ksFile
+                storePassword = System.getenv("KEYSTORE_PASSWORD")
+                keyAlias = System.getenv("KEY_ALIAS")
+                keyPassword = System.getenv("KEY_PASSWORD")
             }
         }
     }
 
     buildTypes {
         release {
-            signingConfig = signingConfigs.getByName("release")
+            val ksPath = System.getenv("KEYSTORE_PATH") ?: "release.keystore"
+            if (file(ksPath).exists()) {
+                signingConfig = signingConfigs.getByName("release")
+            }
             isMinifyEnabled = false
             isShrinkResources = false
             proguardFiles(
