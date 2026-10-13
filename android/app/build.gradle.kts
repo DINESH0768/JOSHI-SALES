@@ -7,7 +7,7 @@ plugins {
 
 android {
     namespace = "com.joshi.kanta_slip"
-    compileSdk = flutter.compileSdkVersion
+    compileSdk = 35
     ndkVersion = flutter.ndkVersion
 
     compileOptions {
