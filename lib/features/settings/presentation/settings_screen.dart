@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../core/services/audio_feedback_service.dart';
 import '../../../core/services/data_export_service.dart';
 import '../../../core/services/firebase_sync_service.dart';
 import '../../../core/theme/app_colors.dart';
@@ -21,6 +22,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   String? _qrImagePath;
   String _backupStatus = 'Checking...';
   bool _isSyncing = false;
+  bool _successToneEnabled = true;
+  bool _voiceSpeechEnabled = true;
 
   @override
   void initState() {
@@ -34,6 +37,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final qrPath = await UpiService.getQrImagePath();
     final enabled = await UpiService.isUpiQrEnabled();
     final status = await FirebaseSyncService.getLastSyncedStatus();
+    final toneOn = await AudioFeedbackService.instance.isToneEnabled();
+    final voiceOn = await AudioFeedbackService.instance.isVoiceEnabled();
 
     if (mounted) {
       setState(() {
@@ -41,6 +46,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _qrImagePath = qrPath;
         _upiQrEnabled = enabled;
         _backupStatus = status;
+        _successToneEnabled = toneOn;
+        _voiceSpeechEnabled = voiceOn;
       });
     }
   }
@@ -384,6 +391,30 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 child: Column(
                   children: [
                     _buildRow(
+                      icon: Icons.volume_up_outlined,
+                      title: 'Success tone',
+                      subtitle: 'Payment/scan par ti-ting tone',
+                      trailing: _buildSwitch(
+                        value: _successToneEnabled,
+                        onChanged: (val) async {
+                          setState(() => _successToneEnabled = val);
+                          await AudioFeedbackService.instance.setToneEnabled(val);
+                        },
+                      ),
+                    ),
+                    _buildRow(
+                      icon: Icons.record_voice_over_outlined,
+                      title: 'Bolkar batao (voice)',
+                      subtitle: 'Hindi TTS aawaz (500 rupaye mile)',
+                      trailing: _buildSwitch(
+                        value: _voiceSpeechEnabled,
+                        onChanged: (val) async {
+                          setState(() => _voiceSpeechEnabled = val);
+                          await AudioFeedbackService.instance.setVoiceEnabled(val);
+                        },
+                      ),
+                    ),
+                    _buildRow(
                       icon: Icons.lock_outline_rounded,
                       title: 'App lock',
                       subtitle: 'Fingerprint / PIN',
@@ -443,6 +474,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ],
                         ),
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // TTS Hint Notice
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: AppColors.surface,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: AppColors.border, width: 0.5),
+                ),
+                child: const Text(
+                  'Hindi awaaz ke liye phone ki Text-to-speech settings mein Hindi voice install karo.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: AppColors.muted,
+                    fontSize: 10,
+                  ),
                 ),
               ),
               const SizedBox(height: 12),

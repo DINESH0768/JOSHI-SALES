@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_mlkit_text_recognition/google_mlkit_text_recognition.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../core/services/audio_feedback_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/db/app_database.dart';
 import '../domain/services/ocr_parser.dart';
@@ -166,6 +167,8 @@ class _AutoScanScreenState extends State<AutoScanScreen> with SingleTickerProvid
     } catch (_) {}
 
     final finalData = data.copyWith(scanPhotoPath: photoPath);
+
+    AudioFeedbackService.instance.playScanSuccess();
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

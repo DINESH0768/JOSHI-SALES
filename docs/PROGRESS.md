@@ -120,3 +120,15 @@
   - Updated `README.md` with setup steps, Firebase config instructions, UPI QR import, keystore backup procedures, and test execution commands.
   - Added unit tests (`test/firebase_sync_test.dart`, `test/data_export_test.dart`).
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 46 tests passing).
+
+## Milestone 11: Success Tone & Spoken Voice Feedback
+- **Status:** Completed
+- **Changes Summary:**
+  - Synthesized original dual-note C6-G6 "ti-ting" chime (`assets/sounds/ding.wav`) using sine wave decay synthesis.
+  - Implemented `HindiNumberSpeaker` (`lib/core/services/hindi_number_speaker.dart`) for converting integer amounts into natural spoken Hindi phrases (e.g., 500 $\rightarrow$ "paanch sau", 1500 $\rightarrow$ "pandrah sau", 184500 $\rightarrow$ "ek lakh churaasi hazaar paanch sau").
+  - Implemented `AudioFeedbackService` (`lib/core/services/audio_feedback_service.dart`) utilizing `audioplayers` for preloading ding tone and `flutter_tts` for Hindi speech (`hi-IN`, speechRate 0.45), with safe offline/missing voice error handling and Haptic feedback.
+  - Triggered audio feedback strictly on actual received payments: Cash (`"{amount} rupaye cash mein mile"`), UPI (`"{amount} rupaye UPI se mile"`), and Udhar Jama (`"{amount} rupaye jama hue"`). Ensured audio does NOT trigger on Pending or credit allocations.
+  - Triggered audio feedback on successful OCR scan (`"Slip mil gayi"`). Single-execution flags guard against duplicate triggers on rebuild.
+  - Updated `SettingsScreen` with switches for "Success tone" and "Bolkar batao (voice)" and TTS Hindi voice setup hint notice.
+  - Added unit tests (`test/hindi_number_speaker_test.dart`, `test/audio_feedback_service_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 48 tests passing across 23 test files).
