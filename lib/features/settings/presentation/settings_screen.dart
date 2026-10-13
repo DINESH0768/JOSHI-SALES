@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../core/motion.dart';
 import '../../../core/services/audio_feedback_service.dart';
 import '../../../core/services/data_export_service.dart';
 import '../../../core/services/firebase_sync_service.dart';
@@ -24,6 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   bool _isSyncing = false;
   bool _successToneEnabled = true;
   bool _voiceSpeechEnabled = true;
+  bool _animationsEnabled = true;
 
   @override
   void initState() {
@@ -33,6 +35,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 
   Future<void> _loadSettings() async {
+    await AppMotion.init();
     final upiId = await UpiService.getUpiId();
     final qrPath = await UpiService.getQrImagePath();
     final enabled = await UpiService.isUpiQrEnabled();
@@ -48,6 +51,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         _backupStatus = status;
         _successToneEnabled = toneOn;
         _voiceSpeechEnabled = voiceOn;
+        _animationsEnabled = AppMotion.animationsSetting;
       });
     }
   }
@@ -411,6 +415,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         onChanged: (val) async {
                           setState(() => _voiceSpeechEnabled = val);
                           await AudioFeedbackService.instance.setVoiceEnabled(val);
+                        },
+                      ),
+                    ),
+                    _buildRow(
+                      icon: Icons.animation_rounded,
+                      title: 'Animations',
+                      subtitle: 'Smooth fintech transitions',
+                      trailing: _buildSwitch(
+                        value: _animationsEnabled,
+                        onChanged: (val) async {
+                          setState(() => _animationsEnabled = val);
+                          await AppMotion.setAnimationsSetting(val);
                         },
                       ),
                     ),

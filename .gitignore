@@ -63,6 +63,11 @@ local.properties
 **/android/key.properties
 **/android/app/google-services.json
 
+# Platform generated plugins
+/linux/flutter/
+/windows/flutter/
+/macos/Flutter/
+
 # Environment & Secrets
 .env
 *.env

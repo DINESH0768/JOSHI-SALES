@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_scale_button.dart';
+import '../../../core/widgets/count_up_text.dart';
+import '../../../core/widgets/staggered_list_row.dart';
 import '../../../data/db/app_database.dart';
 import '../../payments/domain/services/payment_service.dart';
 
@@ -152,8 +155,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       onTap: () => context.push('/income/today'),
                       child: Row(
                         children: [
-                          Text(
-                            _latestPayment != null ? '₹${_latestPayment!.amount}' : '₹0',
+                          CountUpText(
+                            value: _latestPayment != null ? _latestPayment!.amount : 0,
                             style: const TextStyle(color: AppColors.text, fontSize: 30, fontWeight: FontWeight.bold),
                           ),
                           const SizedBox(width: 8),
@@ -182,7 +185,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       children: [
                         Expanded(
-                          child: GestureDetector(
+                          child: AppScaleButton(
                             onTap: () => context.push('/slips/new'),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -197,7 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: GestureDetector(
+                          child: AppScaleButton(
                             onTap: () => context.push('/slips/scan'),
                             child: Container(
                               padding: const EdgeInsets.symmetric(vertical: 10),
@@ -252,45 +255,50 @@ class _HomeScreenState extends State<HomeScreen> {
                     )
                   else
                     Column(
-                      children: _todayPayments.map((p) {
-                        return Container(
-                          margin: const EdgeInsets.only(bottom: 6),
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
-                          decoration: BoxDecoration(
-                            color: AppColors.lightSurface,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 32,
-                                height: 32,
-                                decoration: BoxDecoration(
-                                  color: p.mode == 'cash' ? const Color(0xFFEAF7D0) : const Color(0xFFE3E9FF),
-                                  shape: BoxShape.circle,
+                      children: _todayPayments.asMap().entries.map((entry) {
+                        final i = entry.key;
+                        final p = entry.value;
+                        return StaggeredListRow(
+                          index: i,
+                          child: Container(
+                            margin: const EdgeInsets.only(bottom: 6),
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: AppColors.lightSurface,
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  width: 32,
+                                  height: 32,
+                                  decoration: BoxDecoration(
+                                    color: p.mode == 'cash' ? const Color(0xFFEAF7D0) : const Color(0xFFE3E9FF),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  alignment: Alignment.center,
+                                  child: Icon(
+                                    p.mode == 'cash' ? Icons.payments_rounded : Icons.qr_code_2_rounded,
+                                    color: p.mode == 'cash' ? const Color(0xFF1E7A3A) : const Color(0xFF2A3570),
+                                    size: 16,
+                                  ),
                                 ),
-                                alignment: Alignment.center,
-                                child: Icon(
-                                  p.mode == 'cash' ? Icons.payments_rounded : Icons.qr_code_2_rounded,
-                                  color: p.mode == 'cash' ? const Color(0xFF1E7A3A) : const Color(0xFF2A3570),
-                                  size: 16,
+                                const SizedBox(width: 10),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text('Payment (${p.mode.toUpperCase()})', style: const TextStyle(color: AppColors.lightText, fontSize: 13, fontWeight: FontWeight.w500)),
+                                      Text(DateFormat('hh:mm a').format(p.receivedAt), style: const TextStyle(color: Color(0xFF6B6B6B), fontSize: 11)),
+                                    ],
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 10),
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text('Payment (${p.mode.toUpperCase()})', style: const TextStyle(color: AppColors.lightText, fontSize: 13, fontWeight: FontWeight.w500)),
-                                    Text(DateFormat('hh:mm a').format(p.receivedAt), style: const TextStyle(color: Color(0xFF6B6B6B), fontSize: 11)),
-                                  ],
+                                Text(
+                                  '+₹${p.amount}',
+                                  style: const TextStyle(color: Color(0xFF1E7A3A), fontSize: 14, fontWeight: FontWeight.bold),
                                 ),
-                              ),
-                              Text(
-                                '+₹${p.amount}',
-                                style: const TextStyle(color: Color(0xFF1E7A3A), fontSize: 14, fontWeight: FontWeight.bold),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       }).toList(),

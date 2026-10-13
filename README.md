@@ -13,6 +13,8 @@ Kanta Slip is a modern Flutter application for managing weighbridge (धर्�
 - **Milestone 8:** Earning History date-wise line graph (`fl_chart`), range chips (7d, 15d, 30d, custom month), metric toggle (Kamai/Kharcha/Bachat), dark-green comparison card with percentage change, and Indian currency notation (`1,84,500`).
 - **Milestone 9:** Auto Scan OCR (camera live stream, Devanagari + English text recognition, multi-frame voting, confidence tags, auto net weight recomputation, duplicate receipt detection, and payment flow redirection).
 - **Milestone 10:** Offline-first Firebase backup/sync, Cloud OCR assist, complete JSON backup export/restore, PDF summary reports, release APK build setup with ProGuard rules, GitHub Actions CI/CD workflow, and production polish.
+- **Milestone 11:** Success tone (synthesized dual-note `ding.wav` chime) and Hindi spoken voice feedback (`flutter_tts`, `HindiNumberSpeaker`) for received payments and scan completions.
+- **Milestone 12:** Fintech-style smooth animations (`AppMotion`), custom page route transitions, floating bottom nav pill slide/opacity, `CountUpText` amount animations, `AppScaleButton` press feedback, `StaggeredListRow` entrances, and reduced-motion / settings toggles.
 
 ## Project Setup & Environment Configuration
 1. Clone the repository and install Flutter dependencies:

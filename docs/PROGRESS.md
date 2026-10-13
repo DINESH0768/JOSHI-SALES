@@ -132,3 +132,16 @@
   - Updated `SettingsScreen` with switches for "Success tone" and "Bolkar batao (voice)" and TTS Hindi voice setup hint notice.
   - Added unit tests (`test/hindi_number_speaker_test.dart`, `test/audio_feedback_service_test.dart`).
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 48 tests passing across 23 test files).
+
+## Milestone 12: Smooth Animations & Central Motion System
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented central motion system (`lib/core/motion.dart`) defining standard durations (`fast` 150ms, `base` 250ms, `slow` 400ms, `bottomNav` 350ms, `countUp` 700ms) and curves (`easeOutCubic`, `easeOutBack`), with automatic checks for system reduced motion (`MediaQuery.of(context).disableAnimations`) and Settings toggles.
+  - Implemented reusable animation widgets: `CountUpText` (700ms easeOutCubic count-up with Indian currency formatting), `AppScaleButton` (150ms 0.95 scale-on-press with light haptic), `StaggeredListRow` (staggered entrance fade+slide), `PaymentSuccessCheck` (bouncy green checkmark pop), and `ShimmerPlaceholder`.
+  - Updated `app_router.dart` with `CustomTransitionPage` page transitions (250ms fade + slide-up).
+  - Updated `FloatingBottomNav` with smooth pill width, opacity, icon scale, and sliding indicator animations (350ms).
+  - Updated `HomeScreen`, `AajKiIncomeScreen`, `KharchaScreen`, `KamaiHistoryScreen`, `PaymentPostSaveScreen`, and `AutoScanScreen` with motion components.
+  - Added "Animations" switch to `SettingsScreen` (default ON).
+  - Fixed GitHub Actions release build workflow (`build_apk.yml` and `create_keystore.yml`).
+  - Added unit and widget tests (`test/motion_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 49 tests passing across 24 test files).

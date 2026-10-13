@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/services/audio_feedback_service.dart';
+import '../../../core/widgets/payment_success_check.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/db/app_database.dart';
 import '../../../data/db/slip_repository.dart';
@@ -374,7 +375,7 @@ class _PaymentPostSaveScreenState extends State<PaymentPostSaveScreen> {
                   alignment: Alignment.center,
                   child: Column(
                     children: [
-                      const Icon(Icons.check_circle_rounded, color: AppColors.lime, size: 48),
+                      const PaymentSuccessCheck(size: 48),
                       const SizedBox(height: 10),
                       Text(
                         _successMsg,
