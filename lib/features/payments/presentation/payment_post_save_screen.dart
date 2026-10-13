@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
+import '../../../core/services/audio_feedback_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/db/app_database.dart';
 import '../../../data/db/slip_repository.dart';
@@ -58,6 +59,7 @@ class _PaymentPostSaveScreenState extends State<PaymentPostSaveScreen> {
   Future<void> _onCashPayment() async {
     if (_slip == null) return;
     await _paymentService.recordCashPayment(slipId: _slip!.id, amount: _slip!.charge.toDouble());
+    AudioFeedbackService.instance.playPaymentSuccess(amount: _slip!.charge, mode: 'cash');
     if (mounted) {
       setState(() {
         _successMsg = '₹${_slip!.charge} Cash mein mile';
@@ -69,6 +71,7 @@ class _PaymentPostSaveScreenState extends State<PaymentPostSaveScreen> {
   Future<void> _onUpiPayment() async {
     if (_slip == null) return;
     await _paymentService.recordUpiPayment(slipId: _slip!.id, amount: _slip!.charge.toDouble());
+    AudioFeedbackService.instance.playPaymentSuccess(amount: _slip!.charge, mode: 'upi');
     if (mounted) {
       setState(() {
         _successMsg = 'Payment mil gaya (UPI)';

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import '../../../core/services/audio_feedback_service.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../data/db/app_database.dart';
 import 'jama_rasid_pdf_generator.dart';
@@ -20,6 +21,7 @@ class _JamaRasidScreenState extends State<JamaRasidScreen> {
   List<SlipsTableData> _clearedSlips = [];
   int _remainingBalance = 0;
   bool _isLoading = true;
+  bool _hasTriggeredAudio = false;
 
   @override
   void initState() {
@@ -61,6 +63,11 @@ class _JamaRasidScreenState extends State<JamaRasidScreen> {
           _remainingBalance = remainingBaki;
           _isLoading = false;
         });
+
+        if (!_hasTriggeredAudio) {
+          _hasTriggeredAudio = true;
+          AudioFeedbackService.instance.playPaymentSuccess(amount: pay.amount, mode: 'udhar_jama');
+        }
       }
     }
   }
