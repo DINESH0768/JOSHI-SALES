@@ -8,7 +8,7 @@ void main() {
     await tester.pumpAndSettle();
 
     // Verify Home screen loaded
-    expect(find.text('Kanta Slip'), findsWidgets);
+    expect(find.text('Slips'), findsWidgets);
 
     // Find and tap + button on Home header
     final plusFinder = find.byIcon(Icons.add_rounded);

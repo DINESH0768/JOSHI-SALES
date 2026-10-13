@@ -58,7 +58,7 @@ void main() {
     await tester.enterText(fields.at(3), 'RJ 31 GA 5555'); // vehicle no
     await tester.enterText(fields.at(5), '25000'); // gross 1
     await tester.enterText(fields.at(6), '5000'); // tare 1
-    await tester.enterText(fields.at(8), '400'); // charge
+    await tester.enterText(fields.at(9), '400'); // charge
 
     await tester.pump(const Duration(milliseconds: 300));
 
