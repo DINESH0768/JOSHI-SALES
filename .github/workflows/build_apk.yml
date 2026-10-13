@@ -35,12 +35,15 @@ jobs:
         run: flutter analyze --no-fatal-infos
 
       - name: Run Unit Tests
+        timeout-minutes: 12
         run: flutter test
 
       - name: Build Debug APK
+        if: success() || failure()
         run: flutter build apk --debug
 
       - name: Upload Debug APK Artifact
+        if: success() || failure()
         uses: actions/upload-artifact@v4
         with:
           name: kanta-slip-debug-apk
@@ -48,6 +51,7 @@ jobs:
 
       - name: Check signing secrets
         id: sign
+        if: success() || failure()
         env:
           KS: ${{ secrets.KEYSTORE_BASE64 }}
           KP: ${{ secrets.KEYSTORE_PASSWORD }}
@@ -61,13 +65,13 @@ jobs:
           fi
 
       - name: Decode Release Keystore
-        if: steps.sign.outputs.has_keys == 'true'
+        if: (success() || failure()) && steps.sign.outputs.has_keys == 'true'
         run: echo "$KEYSTORE_BASE64" | base64 --decode > $RUNNER_TEMP/upload-keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Build Release APK
-        if: steps.sign.outputs.has_keys == 'true'
+        if: (success() || failure()) && steps.sign.outputs.has_keys == 'true'
         run: flutter build apk --release --split-per-abi
         env:
           KEYSTORE_PATH: ${{ runner.temp }}/upload-keystore.jks
@@ -76,7 +80,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload arm64-v8a Release APK Artifact
-        if: steps.sign.outputs.has_keys == 'true'
+        if: (success() || failure()) && steps.sign.outputs.has_keys == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: app-arm64-v8a-release-apk

@@ -52,7 +52,6 @@ class _AppScaleButtonState extends State<AppScaleButton> with SingleTickerProvid
   void _onTapUp(TapUpDetails details) {
     if (widget.onTap != null) {
       _controller.reverse();
-      widget.onTap!();
     }
   }
 
@@ -73,6 +72,7 @@ class _AppScaleButtonState extends State<AppScaleButton> with SingleTickerProvid
     }
 
     return GestureDetector(
+      onTap: widget.onTap,
       onTapDown: _onTapDown,
       onTapUp: _onTapUp,
       onTapCancel: _onTapCancel,

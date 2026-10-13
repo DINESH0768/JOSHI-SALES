@@ -79,5 +79,5 @@ void main() {
     expect(saved.vehicleNo, 'RJ 31 GA 5555');
     expect(saved.charge, 400);
     expect(navigated, isTrue);
-  });
+  }, timeout: const Timeout(Duration(seconds: 10)));
 }
