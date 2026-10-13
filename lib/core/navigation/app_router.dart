@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../core/motion.dart';
 import '../../core/widgets/floating_bottom_nav.dart';
 import '../../data/db/app_database.dart';
 import '../../features/home/presentation/home_screen.dart';
@@ -26,88 +27,116 @@ import '../../features/udhar/presentation/udhar_list_screen.dart';
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 final AppDatabase _db = AppDatabase();
 
+Page<dynamic> buildSmoothPage({required BuildContext context, required GoRouterState state, required Widget child}) {
+  return CustomTransitionPage(
+    key: state.pageKey,
+    child: child,
+    transitionDuration: AppMotion.base,
+    reverseTransitionDuration: AppMotion.base,
+    transitionsBuilder: (context, animation, secondaryAnimation, child) {
+      if (!AppMotion.isAnimationsEnabled(context)) {
+        return child;
+      }
+      final slideAnim = Tween<Offset>(
+        begin: const Offset(0.0, 0.08),
+        end: Offset.zero,
+      ).animate(CurvedAnimation(parent: animation, curve: AppMotion.easeOutCubic));
+
+      final fadeAnim = CurvedAnimation(parent: animation, curve: AppMotion.easeOutCubic);
+
+      return FadeTransition(
+        opacity: fadeAnim,
+        child: SlideTransition(
+          position: slideAnim,
+          child: child,
+        ),
+      );
+    },
+  );
+}
+
 final appRouter = GoRouter(
   navigatorKey: _rootNavigatorKey,
   initialLocation: '/home',
   routes: [
     GoRoute(
       path: '/splash',
-      builder: (context, state) => const SplashScreen(),
+      pageBuilder: (context, state) => buildSmoothPage(context: context, state: state, child: const SplashScreen()),
     ),
     GoRoute(
       path: '/settings',
-      builder: (context, state) => const SettingsScreen(),
+      pageBuilder: (context, state) => buildSmoothPage(context: context, state: state, child: const SettingsScreen()),
     ),
     GoRoute(
       path: '/slips/new',
-      builder: (context, state) => NewSlipScreen(db: _db),
+      pageBuilder: (context, state) => buildSmoothPage(context: context, state: state, child: NewSlipScreen(db: _db)),
     ),
     GoRoute(
       path: '/slips/scan',
-      builder: (context, state) => AutoScanScreen(db: _db),
+      pageBuilder: (context, state) => buildSmoothPage(context: context, state: state, child: AutoScanScreen(db: _db)),
     ),
     GoRoute(
       path: '/slips/scan-result',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final extra = state.extra as ScannedSlipData?;
         final data = extra ??
             OcrParser.parseText(
                 'रसीद नं. 1031\n11/10/2026\nमोहन लाल\nRJ 31 GA 0987\nगेहूं\nवाहन सहित माल 52,350 kg\nखाली तुलाने पर 13,450 kg');
-        return ScanResultScreen(scannedData: data, db: _db);
+        return buildSmoothPage(context: context, state: state, child: ScanResultScreen(scannedData: data, db: _db));
       },
     ),
     GoRoute(
       path: '/slips/card/:id',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final id = state.pathParameters['id'] ?? '';
-        return SlipCardScreen(slipId: id, db: _db);
+        return buildSmoothPage(context: context, state: state, child: SlipCardScreen(slipId: id, db: _db));
       },
     ),
     GoRoute(
       path: '/payments/post-save/:slipId',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final slipId = state.pathParameters['slipId'] ?? '';
-        return PaymentPostSaveScreen(slipId: slipId, db: _db);
+        return buildSmoothPage(context: context, state: state, child: PaymentPostSaveScreen(slipId: slipId, db: _db));
       },
     ),
     GoRoute(
       path: '/income/today',
-      builder: (context, state) => AajKiIncomeScreen(db: _db),
+      pageBuilder: (context, state) => buildSmoothPage(context: context, state: state, child: AajKiIncomeScreen(db: _db)),
     ),
     GoRoute(
       path: '/income/history',
-      builder: (context, state) => KamaiHistoryScreen(db: _db),
+      pageBuilder: (context, state) => buildSmoothPage(context: context, state: state, child: KamaiHistoryScreen(db: _db)),
     ),
     GoRoute(
       path: '/payments/upi/:slipId',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final slipId = state.pathParameters['slipId'] ?? '';
-        return UpiPaymentScreen(slipId: slipId, db: _db);
+        return buildSmoothPage(context: context, state: state, child: UpiPaymentScreen(slipId: slipId, db: _db));
       },
     ),
     GoRoute(
       path: '/udhar/customer/:id',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final id = state.pathParameters['id'] ?? '';
-        return CustomerDetailScreen(customerId: id, db: _db);
+        return buildSmoothPage(context: context, state: state, child: CustomerDetailScreen(customerId: id, db: _db));
       },
     ),
     GoRoute(
       path: '/udhar/rasid/:paymentId',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final paymentId = state.pathParameters['paymentId'] ?? '';
-        return JamaRasidScreen(paymentId: paymentId, db: _db);
+        return buildSmoothPage(context: context, state: state, child: JamaRasidScreen(paymentId: paymentId, db: _db));
       },
     ),
     GoRoute(
       path: '/kharcha/suppliers',
-      builder: (context, state) => SupplierListScreen(db: _db),
+      pageBuilder: (context, state) => buildSmoothPage(context: context, state: state, child: SupplierListScreen(db: _db)),
     ),
     GoRoute(
       path: '/kharcha/suppliers/:id',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final id = state.pathParameters['id'] ?? '';
-        return SupplierDetailScreen(supplierId: id, db: _db);
+        return buildSmoothPage(context: context, state: state, child: SupplierDetailScreen(supplierId: id, db: _db));
       },
     ),
     StatefulShellRoute.indexedStack(

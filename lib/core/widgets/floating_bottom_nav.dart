@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:kanta_slip/core/theme/app_colors.dart';
+import '../motion.dart';
+import '../theme/app_colors.dart';
 
 class FloatingBottomNav extends StatelessWidget {
   final int currentIndex;
@@ -13,6 +14,7 @@ class FloatingBottomNav extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final enableMotion = AppMotion.isAnimationsEnabled(context);
     final items = [
       _NavItem(icon: Icons.home_rounded, label: 'Home'),
       _NavItem(icon: Icons.receipt_long_rounded, label: 'Slips'),
@@ -39,8 +41,8 @@ class FloatingBottomNav extends StatelessWidget {
             onTap: () => onTap(index),
             behavior: HitTestBehavior.opaque,
             child: AnimatedContainer(
-              duration: const Duration(milliseconds: 200),
-              curve: Curves.easeOutCubic,
+              duration: enableMotion ? AppMotion.bottomNav : Duration.zero,
+              curve: AppMotion.easeOutCubic,
               height: 36,
               padding: EdgeInsets.symmetric(
                 horizontal: isSelected ? 12 : 0,
@@ -58,14 +60,20 @@ class FloatingBottomNav extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Icon(
-                      item.icon,
-                      size: 18,
-                      color: isSelected ? AppColors.onLime : AppColors.text,
+                    AnimatedScale(
+                      scale: isSelected ? 1.05 : 1.0,
+                      duration: enableMotion ? AppMotion.fast : Duration.zero,
+                      child: Icon(
+                        item.icon,
+                        size: 18,
+                        color: isSelected ? AppColors.onLime : AppColors.text,
+                      ),
                     ),
                     if (isSelected) ...[
                       const SizedBox(width: 4),
-                      Flexible(
+                      AnimatedOpacity(
+                        duration: enableMotion ? AppMotion.bottomNav : Duration.zero,
+                        opacity: isSelected ? 1.0 : 0.0,
                         child: Text(
                           item.label,
                           maxLines: 1,
