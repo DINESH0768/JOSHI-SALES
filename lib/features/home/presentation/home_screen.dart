@@ -197,14 +197,24 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(width: 10),
                         Expanded(
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(vertical: 10),
-                            decoration: BoxDecoration(
-                              color: AppColors.surface3,
-                              borderRadius: BorderRadius.circular(12),
+                          child: GestureDetector(
+                            onTap: () => context.push('/slips/scan'),
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(vertical: 10),
+                              decoration: BoxDecoration(
+                                color: AppColors.surface3,
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              alignment: Alignment.center,
+                              child: const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.camera_alt_outlined, color: AppColors.text, size: 16),
+                                  SizedBox(width: 6),
+                                  Text('Scan slip', style: TextStyle(color: AppColors.text, fontSize: 13, fontWeight: FontWeight.w500)),
+                                ],
+                              ),
                             ),
-                            alignment: Alignment.center,
-                            child: const Text('Scan (jaldi aa raha hai)', style: TextStyle(color: AppColors.muted, fontSize: 11)),
                           ),
                         ),
                       ],
@@ -229,7 +239,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     children: [
                       const Text('Latest income list', style: TextStyle(color: AppColors.lightText, fontSize: 13, fontWeight: FontWeight.bold)),
                       GestureDetector(
-                        onTap: () => context.push('/income/today'),
+                        onTap: () => context.push('/income/history'),
                         child: const Text('See all', style: TextStyle(color: AppColors.lightText, fontSize: 11, fontWeight: FontWeight.w500)),
                       ),
                     ],

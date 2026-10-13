@@ -86,3 +86,37 @@
   - Wired `/kharcha`, `/kharcha/suppliers`, and `/kharcha/suppliers/:id` in `app_router.dart`.
   - Added unit tests (`test/expense_service_test.dart`, `test/supplier_service_test.dart`) and widget tests (`test/kharcha_widget_test.dart`).
   - Verified with `flutter analyze` (0 issues) and `flutter test` (all 34 tests passing).
+
+## Milestone 8: Earning History Graph & Range Analytics
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented `EarningHistoryService` (`lib/features/income/domain/services/earning_history_service.dart`) for range calculations (7 days, 15 days, 30 days, custom month), daily payment aggregation (Cash vs UPI counts and amounts), previous period percentage change calculations ($\frac{\text{current} - \text{prev}}{\text{prev}} \times 100$), and Indian currency notation formatting (e.g. `1,84,500`).
+  - Built `KamaiHistoryScreen` (`lib/features/income/presentation/kamai_history_screen.dart`) matching Screen 5 design specs (big total header "Pichle N din ki kamai", range chips 7d/15d/30d/Month, smooth curved line graph using `fl_chart`, lime `#C6F432` line with area fill, touch tooltip bubble, ring indicator dot, metric toggle for Kamai/Kharcha/Bachat, dark-green comparison card "Usse pehle ke N din" with % change badge, and selected day breakdown card).
+  - Integrated `/income/history` route in `app_router.dart` and connected entry points from Home screen "See all" and `AajKiIncomeScreen` header.
+  - Handled reduced motion settings (`MediaQuery.of(context).disableAnimations`) and 1.3x text scaling without overflow.
+  - Added unit tests (`test/earning_history_service_test.dart`) and widget tests (`test/kamai_history_widget_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 38 tests passing).
+
+## Milestone 9: Auto Scan (Camera/Gallery OCR) & Scan Result
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented `OcrParser` (`lib/features/slips/domain/services/ocr_parser.dart`) for extracting receipt no, date, customer name, vehicle no, material, gross weight, tare weight, and confidence ratings from Devanagari & Latin text with auto-recomputed net weight (`gross - tare`).
+  - Implemented `OcrVotingService` (`lib/features/slips/domain/services/ocr_voting_service.dart`) for multi-frame OCR voting aggregation and steady match detection (~1 second auto-capture).
+  - Built `AutoScanScreen` (`lib/features/slips/presentation/auto_scan_screen.dart`) matching Screen 7 design specs (full-screen camera stream, lime corner brackets, moving scan line, live detected field chips, flash toggle, 5-second timeout hints, gallery picker, and manual entry fallback).
+  - Built `ScanResultScreen` (`lib/features/slips/presentation/scan_result_screen.dart`) matching Screen 8 design specs (paper slip summary card, green tick / orange "Check karo" confidence badges, tap-to-edit modal, auto net weight recomputation, required lime Charge field, duplicate receipt warning banner, and save redirection to Milestone 3 payment flow).
+  - Registered `/slips/scan` and `/slips/scan-result` in `app_router.dart` and connected "Scan slip" button on `HomeScreen`.
+  - Added unit tests (`test/ocr_parser_test.dart`) with 3-4 sample Devanagari & English weighbridge slips, voting logic, confidence tagging, net weight recomputation, duplicate receipt checking, and widget tests (`test/auto_scan_widget_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 44 tests passing).
+
+## Milestone 10: Cloud Sync, Export/Restore, ProGuard Rules, GitHub Actions Workflow & Polish
+- **Status:** Completed
+- **Changes Summary:**
+  - Implemented `FirebaseSyncService` (`lib/core/services/firebase_sync_service.dart`) for offline-first local Drift database synchronization, tracking unsynced local records and last synced timestamp.
+  - Implemented `CloudOcrService` (`lib/features/slips/domain/services/cloud_ocr_service.dart`) for optional non-blocking cloud OCR refinement on low-confidence fields.
+  - Implemented `DataExportService` (`lib/core/services/data_export_service.dart`) supporting full JSON backup export & restore roundtrips, and PDF summary reports covering slips, income, udhar, expenses, supplier khata, bachat, and maal-wise totals.
+  - Guarded debug demo data seeder in `AppDatabase` with `kDebugMode` to ensure production release builds remain clean.
+  - Configured ProGuard rules (`android/app/proguard-rules.pro`), Android release signing using Base64 environment variables (`android/app/build.gradle.kts`), and updated `.gitignore` to strictly ignore keystores and secrets (`*.keystore`, `*.jks`, `.env`, `google-services.json`).
+  - Updated GitHub Actions CI/CD workflow (`.github/workflows/build_apk.yml`) to build signed release APKs (`flutter build apk --release --split-per-abi`) and upload `app-arm64-v8a-release.apk` artifact.
+  - Updated `README.md` with setup steps, Firebase config instructions, UPI QR import, keystore backup procedures, and test execution commands.
+  - Added unit tests (`test/firebase_sync_test.dart`, `test/data_export_test.dart`).
+  - Verified with `flutter analyze` (0 issues) and `flutter test` (all 46 tests passing).

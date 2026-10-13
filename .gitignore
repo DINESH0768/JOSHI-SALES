@@ -63,6 +63,10 @@ local.properties
 **/android/key.properties
 **/android/app/google-services.json
 
-# Environment
+# Environment & Secrets
 .env
 *.env
+*.keystore
+*.jks
+**/android/app/google-services.json
+**/ios/Runner/GoogleService-Info.plist
