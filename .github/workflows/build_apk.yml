@@ -1,4 +1,4 @@
-name: Build Android Release APK
+name: Build Android APKs
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build-debug:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -46,38 +46,28 @@ jobs:
           name: kanta-slip-debug-apk
           path: build/app/outputs/flutter-apk/app-debug.apk
 
-  build-release:
-    needs: build-debug
-    if: ${{ secrets.KEYSTORE_BASE64 != '' && secrets.KEYSTORE_PASSWORD != '' && secrets.KEY_ALIAS != '' && secrets.KEY_PASSWORD != '' }}
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Java JDK
-        uses: actions/setup-java@v4
-        with:
-          distribution: 'temurin'
-          java-version: '17'
-
-      - name: Set up Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          channel: 'stable'
-
-      - name: Install dependencies
-        run: flutter pub get
-
-      - name: Run Build Runner
-        run: dart run build_runner build --delete-conflicting-outputs
+      - name: Check signing secrets
+        id: sign
+        env:
+          KS: ${{ secrets.KEYSTORE_BASE64 }}
+          KP: ${{ secrets.KEYSTORE_PASSWORD }}
+          KA: ${{ secrets.KEY_ALIAS }}
+          KKP: ${{ secrets.KEY_PASSWORD }}
+        run: |
+          if [ -n "$KS" ] && [ -n "$KP" ] && [ -n "$KA" ] && [ -n "$KKP" ]; then
+            echo "has_keys=true" >> $GITHUB_OUTPUT
+          else
+            echo "has_keys=false" >> $GITHUB_OUTPUT
+          fi
 
       - name: Decode Release Keystore
+        if: steps.sign.outputs.has_keys == 'true'
         run: echo "$KEYSTORE_BASE64" | base64 --decode > $RUNNER_TEMP/upload-keystore.jks
         env:
           KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
 
       - name: Build Release APK
+        if: steps.sign.outputs.has_keys == 'true'
         run: flutter build apk --release --split-per-abi
         env:
           KEYSTORE_PATH: ${{ runner.temp }}/upload-keystore.jks
@@ -86,6 +76,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
 
       - name: Upload arm64-v8a Release APK Artifact
+        if: steps.sign.outputs.has_keys == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: app-arm64-v8a-release-apk
