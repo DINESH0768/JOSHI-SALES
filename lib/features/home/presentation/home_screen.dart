@@ -19,8 +19,10 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late PaymentService _paymentService;
-  PaymentsTableData? _latestPayment;
   List<PaymentsTableData> _todayPayments = [];
+  int _todayTotal = 0;
+  int _cashTotal = 0;
+  int _upiTotal = 0;
 
   @override
   void initState() {
@@ -32,13 +34,16 @@ class _HomeScreenState extends State<HomeScreen> {
   Future<void> _loadData() async {
     final summary = await _paymentService.getIncomeSummaryForDate(DateTime.now());
     final payments = summary['payments'] as List<PaymentsTableData>? ?? [];
+    final cash = summary['cashTotal'] as int? ?? 0;
+    final upi = summary['upiTotal'] as int? ?? 0;
+    final total = summary['total'] as int? ?? 0;
 
     if (mounted) {
       setState(() {
         _todayPayments = payments;
-        if (payments.isNotEmpty) {
-          _latestPayment = payments.first;
-        }
+        _cashTotal = cash;
+        _upiTotal = upi;
+        _todayTotal = total;
       });
     }
   }
@@ -83,11 +88,11 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(width: 8),
                     const Text(
-                      'Kanta Slip',
+                      'Slips',
                       style: TextStyle(
                         color: AppColors.onLime,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 15,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -126,7 +131,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Overlapping Card (.ovl) - Latest Income
+            // Overlapping Card (.ovl) - Aaj ki income
             Transform.translate(
               offset: const Offset(0, -32),
               child: Container(
@@ -143,45 +148,44 @@ class _HomeScreenState extends State<HomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text('Latest income', style: TextStyle(color: AppColors.muted, fontSize: 11)),
+                        const Text('Aaj ki income', style: TextStyle(color: AppColors.muted, fontSize: 12, fontWeight: FontWeight.w500)),
                         Text(
-                          _latestPayment != null ? DateFormat('aaj, dd MMM').format(_latestPayment!.receivedAt) : 'Aaj',
+                          DateFormat('aaj, dd MMM').format(DateTime.now()),
                           style: const TextStyle(color: AppColors.muted, fontSize: 11),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 6),
                     GestureDetector(
                       onTap: () => context.push('/income/today'),
                       child: Row(
                         children: [
                           CountUpText(
-                            value: _latestPayment != null ? _latestPayment!.amount : 0,
+                            value: _todayTotal,
                             style: const TextStyle(color: AppColors.text, fontSize: 30, fontWeight: FontWeight.bold),
                           ),
-                          const SizedBox(width: 8),
-                          if (_latestPayment != null)
-                            Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                              decoration: BoxDecoration(
-                                color: _latestPayment!.mode == 'cash' ? AppColors.limeTintBg : AppColors.upiBg,
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              child: Text(
-                                _latestPayment!.mode == 'cash' ? 'Cash' : 'UPI',
-                                style: TextStyle(
-                                  color: _latestPayment!.mode == 'cash' ? AppColors.lime : AppColors.upiBlue,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
+                          const SizedBox(width: 10),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                            decoration: BoxDecoration(
+                              color: AppColors.limeTintBg,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Text(
+                              'Cash: ₹$_cashTotal · UPI: ₹$_upiTotal',
+                              style: const TextStyle(
+                                color: AppColors.lime,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
+                          ),
                           const Spacer(),
                           const Icon(Icons.chevron_right_rounded, color: AppColors.muted, size: 20),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 14),
                     Row(
                       children: [
                         Expanded(
@@ -227,7 +231,7 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Light Rounded Sheet (.sheet) - Income List
+            // Light Rounded Sheet (.sheet) - Aaj ki payments
             Container(
               margin: const EdgeInsets.only(left: 14, right: 14, bottom: 20),
               padding: const EdgeInsets.all(12),
@@ -240,10 +244,10 @@ class _HomeScreenState extends State<HomeScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Latest income list', style: TextStyle(color: AppColors.lightText, fontSize: 13, fontWeight: FontWeight.bold)),
+                      const Text('Aaj ki payments', style: TextStyle(color: AppColors.lightText, fontSize: 13, fontWeight: FontWeight.bold)),
                       GestureDetector(
                         onTap: () => context.push('/income/history'),
-                        child: const Text('See all', style: TextStyle(color: AppColors.lightText, fontSize: 11, fontWeight: FontWeight.w500)),
+                        child: const Text('Sabhi dekhein', style: TextStyle(color: AppColors.lightText, fontSize: 11, fontWeight: FontWeight.w500)),
                       ),
                     ],
                   ),
@@ -251,7 +255,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   if (_todayPayments.isEmpty)
                     const Padding(
                       padding: EdgeInsets.symmetric(vertical: 20),
-                      child: Text('Aaj abhi koi income nahi hui hai', style: TextStyle(color: Color(0xFF6B6B6B), fontSize: 12)),
+                      child: Text('Aaj abhi koi payment praapt nahi hui hai', style: TextStyle(color: Color(0xFF6B6B6B), fontSize: 12)),
                     )
                   else
                     Column(
