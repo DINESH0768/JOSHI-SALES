@@ -22,13 +22,10 @@ void main() {
   });
 
   testWidgets('NewSlipScreen saves slip to database when form is valid', (WidgetTester tester) async {
-    // Set logical phone screen dimensions to ensure proper layout without overflow
-    tester.view.physicalSize = const Size(412, 915);
+    // Set explicit physical screen dimensions for CI environment
+    tester.view.physicalSize = const Size(1080, 1920);
     tester.view.devicePixelRatio = 1.0;
-    addTearDown(() {
-      tester.view.resetPhysicalSize();
-      tester.view.resetDevicePixelRatio();
-    });
+    addTearDown(tester.view.resetPhysicalSize);
 
     bool navigated = false;
 
