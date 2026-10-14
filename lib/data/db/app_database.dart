@@ -43,8 +43,9 @@ class AppDatabase extends _$AppDatabase {
             CountersTableCompanion.insert(name: 'jama_receipt', currentValue: 1),
           );
 
-          // Seed Debug Demo Data (only in debug mode)
-          if (kDebugMode) {
+          // Seed Debug Demo Data (only in debug mode and non-test environment)
+          final isTestMode = kDebugMode && Platform.environment.containsKey('FLUTTER_TEST');
+          if (kDebugMode && !isTestMode) {
           const sonuCustId = 'udhar_sonu';
           await into(udharCustomersTable).insert(
             UdharCustomersTableCompanion.insert(
