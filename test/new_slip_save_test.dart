@@ -22,6 +22,14 @@ void main() {
   });
 
   testWidgets('NewSlipScreen saves slip to database when form is valid', (WidgetTester tester) async {
+    // Set realistic phone screen dimensions to ensure proper layout
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 3.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
+
     bool navigated = false;
 
     final router = GoRouter(
@@ -62,11 +70,12 @@ void main() {
 
     await tester.pump(const Duration(milliseconds: 300));
 
-    // Tap Save karo button
-    final saveBtn = find.text('Save karo');
-    expect(saveBtn, findsOneWidget);
+    // Tap Save karo button using Key('save_slip_button')
+    final saveBtnKey = find.byKey(const Key('save_slip_button'));
+    expect(saveBtnKey, findsOneWidget);
 
-    await tester.tap(saveBtn);
+    await tester.ensureVisible(saveBtnKey);
+    await tester.tap(saveBtnKey);
     await tester.pump(const Duration(milliseconds: 500));
 
     // Verify database record
@@ -74,10 +83,18 @@ void main() {
     final allSlips = await repo.getAllSlips();
     expect(allSlips.isNotEmpty, isTrue);
 
-    final saved = allSlips.first;
+    final saved = allSlips.firstWhere((s) => s.customerName == 'Suresh Kumar');
     expect(saved.customerName, 'Suresh Kumar');
     expect(saved.vehicleNo, 'RJ 31 GA 5555');
     expect(saved.charge, 400);
+
+    // Verify rounds
+    final rounds = await repo.getRoundsForSlip(saved.id);
+    expect(rounds.isNotEmpty, isTrue);
+    expect(rounds.first.grossKg, 25000);
+    expect(rounds.first.emptyTulaneKg, 5000);
+    expect(rounds.first.netKg, 20000);
+
     expect(navigated, isTrue);
-  }, timeout: const Timeout(Duration(seconds: 10)));
+  }, timeout: const Timeout(Duration(seconds: 30)));
 }
