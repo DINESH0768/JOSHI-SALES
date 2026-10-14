@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:kanta_slip/data/db/app_database.dart';
 import 'package:kanta_slip/features/udhar/domain/services/udhar_service.dart';
@@ -45,7 +46,38 @@ void main() {
   });
 
   test('recordJamaPayment creates payment J-0001 and updates income and slips', () async {
-    final cust = await (db.select(db.udharCustomersTable)).getSingle(); // Sonu
+    // Insert a test customer and 40 test udhar slips into in-memory DB
+    const custId = 'udhar_test_sonu';
+    await db.into(db.udharCustomersTable).insert(
+          UdharCustomersTableCompanion.insert(
+            id: custId,
+            name: 'Sonu',
+            createdAt: DateTime.now(),
+            updatedAt: DateTime.now(),
+          ),
+        );
+
+    final baseDate = DateTime(2026, 10, 1);
+    for (int i = 1; i <= 40; i++) {
+      final slipId = 'sonu_slip_$i';
+      final slipDate = baseDate.add(Duration(days: i ~/ 2));
+      await db.into(db.slipsTable).insert(
+            SlipsTableCompanion.insert(
+              id: slipId,
+              receiptNo: 2000 + i,
+              date: slipDate,
+              customerName: const Value('Sonu'),
+              vehicleNo: const Value('RJ 31 GA 0000'),
+              charge: 50,
+              status: 'udhar',
+              udharCustomerId: const Value(custId),
+              createdAt: slipDate,
+              updatedAt: slipDate,
+            ),
+          );
+    }
+
+    final cust = await (db.select(db.udharCustomersTable)..where((t) => t.id.equals(custId))).getSingle();
 
     final paymentId = await udharService.recordJamaPayment(
       customerId: cust.id,
