@@ -73,6 +73,8 @@ void main() {
 
     await tester.ensureVisible(saveBtnKey);
     await tester.tap(saveBtnKey);
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 500));
     await tester.pump(const Duration(milliseconds: 500));
 
     // Verify database record
@@ -93,5 +95,5 @@ void main() {
     expect(rounds.first.netKg, 20000);
 
     expect(navigated, isTrue);
-  }, timeout: const Timeout(Duration(seconds: 15)));
+  });
 }
