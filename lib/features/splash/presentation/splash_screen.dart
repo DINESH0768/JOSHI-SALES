@@ -32,7 +32,7 @@ class SplashScreen extends StatelessWidget {
               const SizedBox(height: 14),
               // App Title
               const Text(
-                'Kanta Slip',
+                'Slips',
                 style: TextStyle(
                   color: AppColors.text,
                   fontSize: 26,
@@ -42,7 +42,7 @@ class SplashScreen extends StatelessWidget {
               const SizedBox(height: 4),
               // Subtitle in Lime
               const Text(
-                'कांटा स्लिप',
+                'स्लिप्स',
                 style: TextStyle(
                   color: AppColors.lime,
                   fontSize: 16,

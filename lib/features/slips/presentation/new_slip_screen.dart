@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/widgets/app_scale_button.dart';
 import '../../../data/db/app_database.dart';
 import '../../../data/db/slip_repository.dart';
 import '../../slips/domain/services/slip_calculator.dart';
@@ -199,92 +200,98 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
   Future<void> _onSave() async {
     if (!_validateAndProcess()) return;
 
-    final rounds = _buildRoundInputs();
+    try {
+      final rounds = _buildRoundInputs();
 
-    // Check duplicate warning
-    final allSlips = await _repository.getAllSlips();
-    final existingChecks = <ExistingSlipCheck>[];
+      // Check duplicate warning
+      final allSlips = await _repository.getAllSlips();
+      final existingChecks = <ExistingSlipCheck>[];
 
-    for (var s in allSlips) {
-      final sRounds = await _repository.getRoundsForSlip(s.id);
-      existingChecks.add(
-        ExistingSlipCheck(
-          vehicleNumber: s.vehicleNo,
-          date: DateFormat('dd/MM/yyyy').format(s.date),
-          grossWeights: sRounds.map((r) => r.grossKg.toDouble()).toList(),
-          tareWeights: sRounds.map((r) => (r.emptyTulaneKg ?? 0).toDouble()).toList(),
-        ),
-      );
-    }
-
-    final isDuplicate = SlipCalculator.isDuplicateSlip(
-      vehicleNumber: _vehicleController.text,
-      date: _dateStr,
-      rounds: rounds,
-      existingSlips: existingChecks,
-    );
-
-    if (isDuplicate && mounted) {
-      final shouldProceed = await showDialog<bool>(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            backgroundColor: AppColors.surface,
-            title: const Text('Aisi slip pehle se hai', style: TextStyle(color: AppColors.text, fontSize: 16)),
-            content: const Text('Isi gaadi no, tareekh aur vajan ki slip pehle se bani hui hai. Kya aap ise fir bhi save karna chahte hain?', style: TextStyle(color: AppColors.muted, fontSize: 13)),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: const Text('Radd karein', style: TextStyle(color: AppColors.muted)),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text('Save karein', style: TextStyle(color: AppColors.lime, fontWeight: FontWeight.bold)),
-              ),
-            ],
-          );
-        },
-      );
-
-      if (shouldProceed != true) return;
-    }
-
-    final actualReceiptNo = await _repository.getNextReceiptNumber();
-    final charge = double.parse(_chargeController.text);
-    final roundMaps = [
-      {
-        'material': _mat1Controller.text,
-        'gross': double.parse(_gross1Controller.text),
-        'tare': double.parse(_tare1Controller.text),
-        'driverTare': double.tryParse(_driverTare1Controller.text),
-        'bagExtra': _bagExtra1Controller.text,
+      for (var s in allSlips) {
+        final sRounds = await _repository.getRoundsForSlip(s.id);
+        existingChecks.add(
+          ExistingSlipCheck(
+            vehicleNumber: s.vehicleNo,
+            date: DateFormat('dd/MM/yyyy').format(s.date),
+            grossWeights: sRounds.map((r) => r.grossKg.toDouble()).toList(),
+            tareWeights: sRounds.map((r) => (r.emptyTulaneKg ?? 0).toDouble()).toList(),
+          ),
+        );
       }
-    ];
 
-    if (_hasRound2) {
-      roundMaps.add({
-        'material': _mat2Controller.text,
-        'gross': double.parse(_gross2Controller.text),
-        'tare': double.parse(_tare2Controller.text),
-        'driverTare': double.tryParse(_driverTare2Controller.text),
-        'bagExtra': _bagExtra2Controller.text,
-      });
-    }
+      final isDuplicate = SlipCalculator.isDuplicateSlip(
+        vehicleNumber: _vehicleController.text,
+        date: _dateStr,
+        rounds: rounds,
+        existingSlips: existingChecks,
+      );
 
-    final slipId = await _repository.saveSlip(
-      receiptNo: actualReceiptNo,
-      dateStr: _dateStr,
-      customerName: _customerController.text.trim(),
-      vehicleNo: _vehicleController.text.trim().toUpperCase(),
-      totalNetWeight: _getTotalNet(),
-      charge: charge,
-      rounds: roundMaps,
-    );
+      if (isDuplicate && mounted) {
+        final shouldProceed = await showDialog<bool>(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              backgroundColor: AppColors.surface,
+              title: const Text('Aisi slip pehle se hai', style: TextStyle(color: AppColors.text, fontSize: 16)),
+              content: const Text('Isi gaadi no, tareekh aur vajan ki slip pehle se bani hui hai. Kya aap ise fir bhi save karna chahte hain?', style: TextStyle(color: AppColors.muted, fontSize: 13)),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context, false),
+                  child: const Text('Radd karein', style: TextStyle(color: AppColors.muted)),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.pop(context, true),
+                  child: const Text('Save karein', style: TextStyle(color: AppColors.lime, fontWeight: FontWeight.bold)),
+                ),
+              ],
+            );
+          },
+        );
 
-    await SlipDraftStorage.clearDraft();
+        if (shouldProceed != true) return;
+      }
 
-    if (mounted) {
-      context.go('/payments/post-save/$slipId');
+      final actualReceiptNo = await _repository.getNextReceiptNumber();
+      final charge = double.parse(_chargeController.text);
+      final roundMaps = [
+        {
+          'material': _mat1Controller.text,
+          'gross': double.parse(_gross1Controller.text),
+          'tare': double.parse(_tare1Controller.text),
+          'driverTare': double.tryParse(_driverTare1Controller.text),
+          'bagExtra': _bagExtra1Controller.text,
+        }
+      ];
+
+      if (_hasRound2) {
+        roundMaps.add({
+          'material': _mat2Controller.text,
+          'gross': double.parse(_gross2Controller.text),
+          'tare': double.parse(_tare2Controller.text),
+          'driverTare': double.tryParse(_driverTare2Controller.text),
+          'bagExtra': _bagExtra2Controller.text,
+        });
+      }
+
+      final slipId = await _repository.saveSlip(
+        receiptNo: actualReceiptNo,
+        dateStr: _dateStr,
+        customerName: _customerController.text.trim(),
+        vehicleNo: _vehicleController.text.trim().toUpperCase(),
+        totalNetWeight: _getTotalNet(),
+        charge: charge,
+        rounds: roundMaps,
+      );
+
+      await SlipDraftStorage.clearDraft();
+
+      if (mounted) {
+        context.go('/payments/post-save/$slipId');
+      }
+    } catch (e) {
+      if (mounted) {
+        _showToast('Error: ${e.toString()}');
+      }
     }
   }
 
@@ -420,7 +427,7 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
             keyboardType: TextInputType.number,
             formatters: [FilteringTextInputFormatter.digitsOnly],
           ),
-          // Net weight auto box (.s2 lime tint)
+          // Net weight auto box (.s2 lime tint) - Flexible children prevent overflow
           Container(
             margin: const EdgeInsets.symmetric(vertical: 6),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -432,22 +439,35 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Text('असल माल ', style: TextStyle(color: AppColors.lime, fontSize: 12)),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.bg,
-                        borderRadius: BorderRadius.circular(10),
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Flexible(
+                        child: Text(
+                          'असल माल ',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: AppColors.lime, fontSize: 12),
+                        ),
                       ),
-                      child: const Text('auto', style: TextStyle(color: AppColors.lime, fontSize: 11)),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.bg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Text('auto', style: TextStyle(color: AppColors.lime, fontSize: 11)),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  '${NumberFormat('#,##0').format(netWeight)} kg',
-                  style: const TextStyle(color: AppColors.lime, fontSize: 17, fontWeight: FontWeight.w600),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    '${NumberFormat('#,##0').format(netWeight)} kg',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: AppColors.lime, fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             ),
@@ -487,7 +507,13 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text('Nayi slip', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                  const Flexible(
+                    child: Text(
+                      'Nayi slip',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                    ),
+                  ),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -643,7 +669,7 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
                   ),
                 ),
 
-              // Total Net Weight Summary Bar (.s2 lime bar)
+              // Total Net Weight Summary Bar (.s2 lime bar) - Flexible children prevent overflow
               Container(
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -654,10 +680,20 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('कुल असल माल', style: TextStyle(color: AppColors.onLime, fontSize: 12, fontWeight: FontWeight.w500)),
-                    Text(
-                      '${NumberFormat('#,##0').format(_getTotalNet())} kg',
-                      style: const TextStyle(color: AppColors.onLime, fontSize: 20, fontWeight: FontWeight.bold),
+                    const Flexible(
+                      child: Text(
+                        'कुल असल माल',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: AppColors.onLime, fontSize: 12, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '${NumberFormat('#,##0').format(_getTotalNet())} kg',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: AppColors.onLime, fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),
@@ -698,57 +734,65 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
                   );
                 }).toList(),
               ),
-              const SizedBox(height: 14),
-
-              // Action buttons (Preview & Save)
-              Row(
-                children: [
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: () {
-                        if (_validateAndProcess()) {
-                          _showToast('Form ekdam sahi hai! Preview ready hai.');
-                        }
-                      },
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface3,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(Icons.search_rounded, color: AppColors.text, size: 16),
-                            SizedBox(width: 6),
-                            Text('Preview', style: TextStyle(color: AppColors.text, fontSize: 13)),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: GestureDetector(
-                      onTap: _onSave,
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        decoration: BoxDecoration(
-                          color: AppColors.lime,
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                        alignment: Alignment.center,
-                        child: const Text(
-                          'Save karo',
-                          style: TextStyle(color: AppColors.onLime, fontSize: 13, fontWeight: FontWeight.w600),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
               const SizedBox(height: 16),
+            ],
+          ),
+        ),
+      ),
+      bottomNavigationBar: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: const BoxDecoration(
+          color: AppColors.surface,
+          border: Border(top: BorderSide(color: AppColors.border, width: 0.5)),
+        ),
+        child: SafeArea(
+          top: false,
+          child: Row(
+            children: [
+              Expanded(
+                child: GestureDetector(
+                  onTap: () {
+                    if (_validateAndProcess()) {
+                      _showToast('Form ekdam sahi hai! Preview ready hai.');
+                    }
+                  },
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.surface3,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.search_rounded, color: AppColors.text, size: 16),
+                        SizedBox(width: 6),
+                        Text('Preview', style: TextStyle(color: AppColors.text, fontSize: 13)),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: AppScaleButton(
+                  key: const Key('save_slip_button'),
+                  onTap: _onSave,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(vertical: 12),
+                    decoration: BoxDecoration(
+                      color: AppColors.lime,
+                      borderRadius: BorderRadius.circular(15),
+                    ),
+                    alignment: Alignment.center,
+                    child: const Text(
+                      'Save karo',
+                      style: TextStyle(color: AppColors.onLime, fontSize: 13, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
