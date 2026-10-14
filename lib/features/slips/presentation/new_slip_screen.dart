@@ -427,7 +427,7 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
             keyboardType: TextInputType.number,
             formatters: [FilteringTextInputFormatter.digitsOnly],
           ),
-          // Net weight auto box (.s2 lime tint)
+          // Net weight auto box (.s2 lime tint) - Flexible children prevent overflow
           Container(
             margin: const EdgeInsets.symmetric(vertical: 6),
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -439,22 +439,35 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Row(
-                  children: [
-                    const Text('असल माल ', style: TextStyle(color: AppColors.lime, fontSize: 12)),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: AppColors.bg,
-                        borderRadius: BorderRadius.circular(10),
+                Flexible(
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      const Flexible(
+                        child: Text(
+                          'असल माल ',
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(color: AppColors.lime, fontSize: 12),
+                        ),
                       ),
-                      child: const Text('auto', style: TextStyle(color: AppColors.lime, fontSize: 11)),
-                    ),
-                  ],
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: AppColors.bg,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: const Text('auto', style: TextStyle(color: AppColors.lime, fontSize: 11)),
+                      ),
+                    ],
+                  ),
                 ),
-                Text(
-                  '${NumberFormat('#,##0').format(netWeight)} kg',
-                  style: const TextStyle(color: AppColors.lime, fontSize: 17, fontWeight: FontWeight.w600),
+                const SizedBox(width: 8),
+                Flexible(
+                  child: Text(
+                    '${NumberFormat('#,##0').format(netWeight)} kg',
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(color: AppColors.lime, fontSize: 16, fontWeight: FontWeight.w600),
+                  ),
                 ),
               ],
             ),
@@ -494,7 +507,13 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
                     ),
                   ),
                   const SizedBox(width: 10),
-                  const Text('Nayi slip', style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500)),
+                  const Flexible(
+                    child: Text(
+                      'Nayi slip',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: 15, fontWeight: FontWeight.w500),
+                    ),
+                  ),
                   const Spacer(),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -650,7 +669,7 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
                   ),
                 ),
 
-              // Total Net Weight Summary Bar (.s2 lime bar)
+              // Total Net Weight Summary Bar (.s2 lime bar) - Flexible children prevent overflow
               Container(
                 margin: const EdgeInsets.only(bottom: 10),
                 padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
@@ -661,10 +680,20 @@ class _NewSlipScreenState extends State<NewSlipScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    const Text('कुल असल माल', style: TextStyle(color: AppColors.onLime, fontSize: 12, fontWeight: FontWeight.w500)),
-                    Text(
-                      '${NumberFormat('#,##0').format(_getTotalNet())} kg',
-                      style: const TextStyle(color: AppColors.onLime, fontSize: 20, fontWeight: FontWeight.bold),
+                    const Flexible(
+                      child: Text(
+                        'कुल असल माल',
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(color: AppColors.onLime, fontSize: 12, fontWeight: FontWeight.w500),
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Flexible(
+                      child: Text(
+                        '${NumberFormat('#,##0').format(_getTotalNet())} kg',
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(color: AppColors.onLime, fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),

@@ -22,9 +22,9 @@ void main() {
   });
 
   testWidgets('NewSlipScreen saves slip to database when form is valid', (WidgetTester tester) async {
-    // Set realistic phone screen dimensions to ensure proper layout
-    tester.view.physicalSize = const Size(1080, 2400);
-    tester.view.devicePixelRatio = 3.0;
+    // Set logical phone screen dimensions to ensure proper layout without overflow
+    tester.view.physicalSize = const Size(412, 915);
+    tester.view.devicePixelRatio = 1.0;
     addTearDown(() {
       tester.view.resetPhysicalSize();
       tester.view.resetDevicePixelRatio();
@@ -96,5 +96,5 @@ void main() {
     expect(rounds.first.netKg, 20000);
 
     expect(navigated, isTrue);
-  }, timeout: const Timeout(Duration(seconds: 30)));
+  }, timeout: const Timeout(Duration(seconds: 15)));
 }
